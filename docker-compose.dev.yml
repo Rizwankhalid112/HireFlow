@@ -27,6 +27,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+    env_file: .env
     volumes:
       - ./frontend:/app
       - /app/node_modules
