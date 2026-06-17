@@ -1,0 +1,3594 @@
+[
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "5ac8dfc2-4598-4c1a-9e86-02bda90b195d",
+    "fields": {
+      "canonical_name": "Python",
+      "aliases": [
+        "Python3",
+        "python"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "26b4449c-bb29-4b68-a499-b7fe73ed751f",
+    "fields": {
+      "canonical_name": "JavaScript",
+      "aliases": [
+        "JS",
+        "Javascript",
+        "ECMAScript"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "bc67ce95-dc20-41d9-91f7-2abc9c12dd05",
+    "fields": {
+      "canonical_name": "TypeScript",
+      "aliases": [
+        "TS",
+        "typescript"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "be563d82-4796-49d3-a6ea-a0e68f0e4272",
+    "fields": {
+      "canonical_name": "Java",
+      "aliases": [
+        "Java 17",
+        "Java 11"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8f0bcb8c-9d26-47bc-a198-12c5946a23ed",
+    "fields": {
+      "canonical_name": "C#",
+      "aliases": [
+        "CSharp",
+        "C Sharp"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c4865b25-fa89-48c0-8a85-2077f41539eb",
+    "fields": {
+      "canonical_name": "C++",
+      "aliases": [
+        "CPP",
+        "C plus plus"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "bbcd8e0f-d70f-4838-a638-9fedc272af0c",
+    "fields": {
+      "canonical_name": "C",
+      "aliases": [
+        "C language"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "583389d9-ac7d-4f5d-b51f-a2ffe87d8aae",
+    "fields": {
+      "canonical_name": "Go",
+      "aliases": [
+        "Golang",
+        "go lang"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c4d0bfa1-90db-4799-8582-a31f279cebd0",
+    "fields": {
+      "canonical_name": "Rust",
+      "aliases": [
+        "rust-lang"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "f8545963-0b9d-4ce4-a6bc-f4609062c93a",
+    "fields": {
+      "canonical_name": "Ruby",
+      "aliases": [
+        "Ruby on Rails lang"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "bae2fd98-4fc2-4044-851b-fd74c82bf6b9",
+    "fields": {
+      "canonical_name": "PHP",
+      "aliases": [
+        "php7",
+        "php8"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "5b35c35e-2b14-46c7-ab10-1e669258efc4",
+    "fields": {
+      "canonical_name": "Swift",
+      "aliases": [
+        "SwiftUI lang"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "7b7f3894-b1d4-48d7-9bb2-878f5a031d96",
+    "fields": {
+      "canonical_name": "Kotlin",
+      "aliases": [
+        "Kotlin JVM"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "1e3acdb8-7084-4430-8192-dbb472b5dcc2",
+    "fields": {
+      "canonical_name": "Scala",
+      "aliases": [
+        "Scala 2",
+        "Scala 3"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d972f074-b929-423f-bb92-fb73d699b156",
+    "fields": {
+      "canonical_name": "R",
+      "aliases": [
+        "R language"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "bfc9ce79-320e-4951-a6da-67be55ab5110",
+    "fields": {
+      "canonical_name": "MATLAB",
+      "aliases": [
+        "Matlab"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "92aa840d-ac1f-4b88-b462-16d8ec5a9e24",
+    "fields": {
+      "canonical_name": "Dart",
+      "aliases": [
+        "Dart lang"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "cc79f50b-2ac3-440c-b690-f5005cd74f2c",
+    "fields": {
+      "canonical_name": "Elixir",
+      "aliases": [
+        "Elixir lang"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8ac3a17b-b8c0-4001-9286-47aec898fe27",
+    "fields": {
+      "canonical_name": "Haskell",
+      "aliases": [
+        "Haskell lang"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0cecff37-ad1f-47eb-8caf-c5fdd49d72c1",
+    "fields": {
+      "canonical_name": "Perl",
+      "aliases": [
+        "Perl 5"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "fb66c575-fabf-48e8-9bf4-b8e5045bc985",
+    "fields": {
+      "canonical_name": "Lua",
+      "aliases": [
+        "Lua scripting"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c23a310d-f15d-4309-8bdd-fb9576a36246",
+    "fields": {
+      "canonical_name": "Shell",
+      "aliases": [
+        "Bash",
+        "sh",
+        "Zsh"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "bf9a074d-7bc4-4e2d-8318-b8357d58b631",
+    "fields": {
+      "canonical_name": "PowerShell",
+      "aliases": [
+        "PS",
+        "pwsh"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "fd875e2f-80cf-4dcb-a12d-9bff8bdb80db",
+    "fields": {
+      "canonical_name": "SQL",
+      "aliases": [
+        "Structured Query Language"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a15c229d-7853-4f8a-914f-cccb3732053a",
+    "fields": {
+      "canonical_name": "HTML",
+      "aliases": [
+        "HTML5"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "7ea9a5b7-8916-4d3d-b660-ec2da353af42",
+    "fields": {
+      "canonical_name": "CSS",
+      "aliases": [
+        "CSS3"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "14d7f3dc-adcf-404d-984f-584077037334",
+    "fields": {
+      "canonical_name": "Sass",
+      "aliases": [
+        "SCSS"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "e0a8d19f-edb1-4423-a3f8-7195183aedd6",
+    "fields": {
+      "canonical_name": "Less",
+      "aliases": [
+        "LESS CSS"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "cf8f00f9-f721-4781-b0db-68efaeb7cd41",
+    "fields": {
+      "canonical_name": "React",
+      "aliases": [
+        "ReactJS",
+        "React.js",
+        "react"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "b532f616-9ef4-4c2e-be07-8178d782d53a",
+    "fields": {
+      "canonical_name": "Next.js",
+      "aliases": [
+        "NextJS",
+        "Next"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c3a48cb1-1f5c-42c1-b7c9-aebc5a6e6840",
+    "fields": {
+      "canonical_name": "Vue.js",
+      "aliases": [
+        "Vue",
+        "VueJS",
+        "Vue 3"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "65845bad-e0bd-44a9-87f1-90be8b932cf4",
+    "fields": {
+      "canonical_name": "Nuxt.js",
+      "aliases": [
+        "Nuxt",
+        "NuxtJS"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "ec930a53-7a5b-422f-8834-60c40d7f7390",
+    "fields": {
+      "canonical_name": "Angular",
+      "aliases": [
+        "AngularJS",
+        "Angular 2+"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "4510ce3b-a761-40ca-a644-83353b6d770d",
+    "fields": {
+      "canonical_name": "Svelte",
+      "aliases": [
+        "SvelteKit"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "fd0c0f3c-9f31-4292-bfb2-068331ef2108",
+    "fields": {
+      "canonical_name": "Django",
+      "aliases": [
+        "Django REST",
+        "DRF"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "11ff68df-07c4-4c7d-bfbd-1c2a82971905",
+    "fields": {
+      "canonical_name": "Flask",
+      "aliases": [
+        "Flask API"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c02ba5c2-5041-4298-8853-e0b901f0e11a",
+    "fields": {
+      "canonical_name": "FastAPI",
+      "aliases": [
+        "Fast API"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "66affd3f-a403-4d3a-930f-fb6c283a6687",
+    "fields": {
+      "canonical_name": "Spring Boot",
+      "aliases": [
+        "Spring",
+        "SpringBoot"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "e34ba79e-9054-4bfb-b83e-6fdca31dd06c",
+    "fields": {
+      "canonical_name": "Express.js",
+      "aliases": [
+        "Express",
+        "ExpressJS"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "ba914fd0-e011-438a-b2cf-c12e68375ac3",
+    "fields": {
+      "canonical_name": "NestJS",
+      "aliases": [
+        "Nest.js",
+        "Nest"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "11081723-7059-4872-a1ad-846dd13ea435",
+    "fields": {
+      "canonical_name": "Ruby on Rails",
+      "aliases": [
+        "Rails",
+        "RoR"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "cfdc6f14-a937-4775-b93f-fabdaa5d6add",
+    "fields": {
+      "canonical_name": "Laravel",
+      "aliases": [
+        "Laravel PHP"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "47dfa6ff-82f2-4aa5-b567-a9b6a240f899",
+    "fields": {
+      "canonical_name": "ASP.NET Core",
+      "aliases": [
+        "ASP.NET",
+        "DotNet Core"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d8687a28-5c55-4d71-b0b6-c19362fa7232",
+    "fields": {
+      "canonical_name": "Node.js",
+      "aliases": [
+        "Node",
+        "NodeJS"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "7bcbfb1c-9377-4c95-a036-a58b4abdbc00",
+    "fields": {
+      "canonical_name": "Tailwind CSS",
+      "aliases": [
+        "Tailwind",
+        "TailwindCSS"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "153d8950-dc63-4871-ba95-ade2113843ca",
+    "fields": {
+      "canonical_name": "Bootstrap",
+      "aliases": [
+        "Bootstrap 5"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "19bbd337-c3c2-41a6-8728-272449fd1a5c",
+    "fields": {
+      "canonical_name": "Material UI",
+      "aliases": [
+        "MUI",
+        "Material-UI"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "92981aa9-46bd-4827-bd2d-c02522350089",
+    "fields": {
+      "canonical_name": "Redux",
+      "aliases": [
+        "Redux Toolkit",
+        "RTK"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8d84b0a6-e2d2-4fdf-9eb3-ab0eabab3960",
+    "fields": {
+      "canonical_name": "React Query",
+      "aliases": [
+        "TanStack Query",
+        "@tanstack/react-query"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "1f9bbf31-95df-4c3a-93c4-fff4003a3395",
+    "fields": {
+      "canonical_name": "GraphQL",
+      "aliases": [
+        "GQL"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8f93c8e0-de3b-468c-b3ed-509698fbec9b",
+    "fields": {
+      "canonical_name": "gRPC",
+      "aliases": [
+        "grpc"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "463b7b7f-a6f8-4b2f-b3ca-8ddb049a35d0",
+    "fields": {
+      "canonical_name": "TensorFlow",
+      "aliases": [
+        "TF"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "b0f798e9-fdf9-41a4-9a0b-e5c40cea3c5f",
+    "fields": {
+      "canonical_name": "PyTorch",
+      "aliases": [
+        "torch"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "553d5e05-3c30-4aeb-b73a-884f6582739e",
+    "fields": {
+      "canonical_name": "Scikit-learn",
+      "aliases": [
+        "sklearn"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "bb2b6335-d80d-400c-9ee9-478229f04cd2",
+    "fields": {
+      "canonical_name": "Pandas",
+      "aliases": [
+        "pd"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0ee92c26-42cc-42e4-949a-8190c8525a22",
+    "fields": {
+      "canonical_name": "NumPy",
+      "aliases": [
+        "numpy"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a21d989f-cd63-47e7-a18f-b2dfd9e37a47",
+    "fields": {
+      "canonical_name": "Hugging Face",
+      "aliases": [
+        "Transformers",
+        "HF"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c15db19d-fe65-4b07-a4b1-02bc97f235d3",
+    "fields": {
+      "canonical_name": "LangChain",
+      "aliases": [
+        "langchain"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "2fd0fd81-b8e3-4428-b1f0-474e808892b8",
+    "fields": {
+      "canonical_name": "OpenAI API",
+      "aliases": [
+        "GPT API",
+        "OpenAI"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c479b5e8-9b4a-4d79-89b3-c46361434f5f",
+    "fields": {
+      "canonical_name": "PostgreSQL",
+      "aliases": [
+        "Postgres",
+        "postgres",
+        "psql",
+        "PostgreSQL 16"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "717c5541-0846-4975-bc7e-40d0e1134830",
+    "fields": {
+      "canonical_name": "MySQL",
+      "aliases": [
+        "MariaDB"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "f4f8bd6b-fef0-48ed-8550-b93ad5243789",
+    "fields": {
+      "canonical_name": "SQLite",
+      "aliases": [
+        "sqlite3"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "cf929043-5bbc-4043-a07a-c3fca57c102e",
+    "fields": {
+      "canonical_name": "MongoDB",
+      "aliases": [
+        "Mongo",
+        "mongo"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "10cef713-e676-4a5e-bc23-fee2c5984d06",
+    "fields": {
+      "canonical_name": "Redis",
+      "aliases": [
+        "Redis Cache"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0d6aeca0-5304-41eb-bb79-eb12c039cfca",
+    "fields": {
+      "canonical_name": "Elasticsearch",
+      "aliases": [
+        "Elastic Search",
+        "ES"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a9119496-b275-4e93-b71b-1b9513988ecf",
+    "fields": {
+      "canonical_name": "DynamoDB",
+      "aliases": [
+        "AWS DynamoDB"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "86bc9126-c269-4235-b89a-2a7322fa30bd",
+    "fields": {
+      "canonical_name": "Cassandra",
+      "aliases": [
+        "Apache Cassandra"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "234e3766-0711-40ad-ade8-e6445348afd6",
+    "fields": {
+      "canonical_name": "Neo4j",
+      "aliases": [
+        "Neo4J"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a851a18e-8af9-4267-b8e9-d2f4f6e258cf",
+    "fields": {
+      "canonical_name": "Firebase Firestore",
+      "aliases": [
+        "Firestore"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "fe73d4c3-4d6a-4f73-9c7b-f390a6613a30",
+    "fields": {
+      "canonical_name": "Supabase",
+      "aliases": [
+        "Supabase DB"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0397347e-19f3-4b82-beff-f17778a8306d",
+    "fields": {
+      "canonical_name": "Oracle Database",
+      "aliases": [
+        "Oracle DB",
+        "Oracle"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8c8a004e-3d65-4bfc-a576-31dcbaed0fb9",
+    "fields": {
+      "canonical_name": "Microsoft SQL Server",
+      "aliases": [
+        "MSSQL",
+        "SQL Server"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "f91ea0a0-37be-48c8-a8e9-7f15f407c175",
+    "fields": {
+      "canonical_name": "ClickHouse",
+      "aliases": [
+        "Clickhouse"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "26e108bf-0935-4a05-b16b-ef201abacb94",
+    "fields": {
+      "canonical_name": "Snowflake",
+      "aliases": [
+        "Snowflake DB"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d2a0ba14-df58-415e-bb91-297085f5dded",
+    "fields": {
+      "canonical_name": "BigQuery",
+      "aliases": [
+        "Google BigQuery",
+        "GCP BigQuery"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "5ab531cf-8bc1-4cc1-a02b-9b314652fcd6",
+    "fields": {
+      "canonical_name": "InfluxDB",
+      "aliases": [
+        "Influx"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "215df77e-ca42-4083-a094-431ed160fdcb",
+    "fields": {
+      "canonical_name": "CouchDB",
+      "aliases": [
+        "Couch DB"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "ae4c4f67-7b7f-440d-a91f-427fd6f65f52",
+    "fields": {
+      "canonical_name": "Git",
+      "aliases": [
+        "GitHub",
+        "GitLab",
+        "Bitbucket"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "31870318-7ee6-4c8a-8c06-c41ef084ad01",
+    "fields": {
+      "canonical_name": "Docker",
+      "aliases": [
+        "Docker Compose",
+        "containerization"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "685f3bd2-8239-4daf-91de-1dc57d2aab85",
+    "fields": {
+      "canonical_name": "Kubernetes",
+      "aliases": [
+        "K8s",
+        "k8s"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "59dd0782-c250-47cd-9866-e363dceb7846",
+    "fields": {
+      "canonical_name": "Jenkins",
+      "aliases": [
+        "Jenkins CI"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "ad0c36e8-1d40-4086-9ad0-1e98605edd14",
+    "fields": {
+      "canonical_name": "GitHub Actions",
+      "aliases": [
+        "GHA",
+        "GH Actions"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a00a3c08-558b-480f-b372-58de7e5cfe43",
+    "fields": {
+      "canonical_name": "GitLab CI",
+      "aliases": [
+        "GitLab CI/CD"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "3bf17d31-2669-4b37-bd15-f9fe71604028",
+    "fields": {
+      "canonical_name": "CircleCI",
+      "aliases": [
+        "Circle CI"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "719dac68-5ae2-4170-b847-e330e0f29969",
+    "fields": {
+      "canonical_name": "Terraform",
+      "aliases": [
+        "TF",
+        "IaC"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8d718105-3be0-4c26-9935-454f5d833c05",
+    "fields": {
+      "canonical_name": "Ansible",
+      "aliases": [
+        "ansible-playbook"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "3e64f80c-a5fe-4137-b81f-bd1950d4d7ba",
+    "fields": {
+      "canonical_name": "Nginx",
+      "aliases": [
+        "nginx reverse proxy"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "19881ab4-cf94-4894-ab92-47f3d24f25d4",
+    "fields": {
+      "canonical_name": "Apache",
+      "aliases": [
+        "Apache HTTP"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "4329e002-d2c0-4ebe-b399-d072e948fa1a",
+    "fields": {
+      "canonical_name": "Linux",
+      "aliases": [
+        "Ubuntu",
+        "Debian",
+        "CentOS"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "00180450-d772-4303-a4ed-76ae3e9a31c0",
+    "fields": {
+      "canonical_name": "Windows Server",
+      "aliases": [
+        "Windows"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "17c97bc4-26ab-4e7f-a934-37a845f86ab8",
+    "fields": {
+      "canonical_name": "macOS",
+      "aliases": [
+        "Mac OS"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "aeaaa72e-e0b5-4b85-b0f7-54bebd49733d",
+    "fields": {
+      "canonical_name": "VS Code",
+      "aliases": [
+        "Visual Studio Code"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "06fb236f-c5e6-4c0f-97ce-d54e8545d655",
+    "fields": {
+      "canonical_name": "PyCharm",
+      "aliases": [
+        "JetBrains PyCharm"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "59585cf4-8232-4c81-925f-c7893bceb2c1",
+    "fields": {
+      "canonical_name": "IntelliJ IDEA",
+      "aliases": [
+        "IntelliJ"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "017dd764-8368-4dd3-bf82-4314774d36f7",
+    "fields": {
+      "canonical_name": "Postman",
+      "aliases": [
+        "Postman API"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "456f0fa2-d877-4ed7-a7f3-d8feb48283e2",
+    "fields": {
+      "canonical_name": "Swagger",
+      "aliases": [
+        "OpenAPI",
+        "Swagger UI"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "605d3a8b-5cf2-4f25-b036-ae2b4f1215ee",
+    "fields": {
+      "canonical_name": "Jira",
+      "aliases": [
+        "Atlassian Jira"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "f45daa84-22c4-4bda-987c-31ce9b61075d",
+    "fields": {
+      "canonical_name": "Confluence",
+      "aliases": [
+        "Atlassian Confluence"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "b183085c-c949-4fec-96bd-3c0eea14ac8f",
+    "fields": {
+      "canonical_name": "Slack",
+      "aliases": [
+        "Slack messaging"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "71198b6e-891d-4297-a061-418d43f8c7cb",
+    "fields": {
+      "canonical_name": "Figma",
+      "aliases": [
+        "Figma design"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0d0b1c82-6b3a-45f6-a0c0-f09e0c48d8c3",
+    "fields": {
+      "canonical_name": "Webpack",
+      "aliases": [
+        "webpack bundler"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0b60d589-71bb-45e2-a7ff-80fbceb5b4aa",
+    "fields": {
+      "canonical_name": "Vite",
+      "aliases": [
+        "ViteJS"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "5e147e40-fcec-413e-8487-83c85afbbfd4",
+    "fields": {
+      "canonical_name": "Babel",
+      "aliases": [
+        "BabelJS"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "86f26d1e-9dea-48d1-b020-7d522f372a33",
+    "fields": {
+      "canonical_name": "ESLint",
+      "aliases": [
+        "eslint"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "575fe997-14e3-44bc-b3b7-abfee14ce431",
+    "fields": {
+      "canonical_name": "Prettier",
+      "aliases": [
+        "prettier formatter"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a87212ee-e2fa-47c5-b2c8-69840dcd94ce",
+    "fields": {
+      "canonical_name": "Jest",
+      "aliases": [
+        "Jest testing"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "968fd3ea-7c1a-438c-804f-8315c25f6b91",
+    "fields": {
+      "canonical_name": "Pytest",
+      "aliases": [
+        "pytest"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "527f2197-2eef-4183-b94a-b15e4fa46c6b",
+    "fields": {
+      "canonical_name": "Cypress",
+      "aliases": [
+        "Cypress E2E"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a74003ee-bdeb-4534-9dce-32379782276f",
+    "fields": {
+      "canonical_name": "Selenium",
+      "aliases": [
+        "Selenium WebDriver"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "6903e0f7-66ab-445a-a461-154485151353",
+    "fields": {
+      "canonical_name": "Playwright",
+      "aliases": [
+        "Playwright E2E"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "22fce33f-f3c5-4b6b-a31c-7daedad2dcda",
+    "fields": {
+      "canonical_name": "Maven",
+      "aliases": [
+        "Apache Maven"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "3fb0b487-43b5-48fa-81ee-bba6d116e6bf",
+    "fields": {
+      "canonical_name": "Gradle",
+      "aliases": [
+        "Gradle build"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "69eaff37-9ada-4758-bfb0-de246c298e56",
+    "fields": {
+      "canonical_name": "npm",
+      "aliases": [
+        "npm package manager"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "6849fa93-770f-4340-8ae9-ba13ccdb5767",
+    "fields": {
+      "canonical_name": "Yarn",
+      "aliases": [
+        "Yarn package manager"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "578a9d27-9440-48c2-b0a0-2a818e90f30f",
+    "fields": {
+      "canonical_name": "pnpm",
+      "aliases": [
+        "pnpm package manager"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0d138fee-f223-48ee-9ede-4dc71e81ed05",
+    "fields": {
+      "canonical_name": "pip",
+      "aliases": [
+        "pip3"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8b5707ef-6c8e-48f3-8472-0eb54358d4d7",
+    "fields": {
+      "canonical_name": "Poetry",
+      "aliases": [
+        "Python Poetry"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a1896073-1330-41fd-8b10-de6e8e70eb31",
+    "fields": {
+      "canonical_name": "Celery",
+      "aliases": [
+        "Celery tasks"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "39486bdc-e7a3-483b-be1c-63fd536e0cd4",
+    "fields": {
+      "canonical_name": "RabbitMQ",
+      "aliases": [
+        "Rabbit MQ"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "f66bed1c-9e2b-4619-8280-366b866f1a14",
+    "fields": {
+      "canonical_name": "Kafka",
+      "aliases": [
+        "Apache Kafka"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "24fd6c1d-3b79-4e3e-acfc-266114c8605c",
+    "fields": {
+      "canonical_name": "Airflow",
+      "aliases": [
+        "Apache Airflow"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "6d0b9613-9961-4d71-aa5f-e2ee6279c122",
+    "fields": {
+      "canonical_name": "Spark",
+      "aliases": [
+        "Apache Spark"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0b8bb4e1-089f-4fc6-b2c4-7ff5ab98bf7a",
+    "fields": {
+      "canonical_name": "Hadoop",
+      "aliases": [
+        "Apache Hadoop"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "41ef0bde-8368-44e9-b9c4-e85628b4daa0",
+    "fields": {
+      "canonical_name": "Tableau",
+      "aliases": [
+        "Tableau BI"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "7016ad9d-1df3-4e7c-b639-3f254b55ed10",
+    "fields": {
+      "canonical_name": "Power BI",
+      "aliases": [
+        "PowerBI"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "b1e2d1dc-e7ec-4cb8-b2f7-85f4a76aa378",
+    "fields": {
+      "canonical_name": "Looker",
+      "aliases": [
+        "Google Looker"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "4569351a-3b59-4cec-bcfc-c412d8b69d02",
+    "fields": {
+      "canonical_name": "Grafana",
+      "aliases": [
+        "Grafana dashboards"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "eaabdf33-41e1-48f5-8b15-5467cd39b858",
+    "fields": {
+      "canonical_name": "Prometheus",
+      "aliases": [
+        "Prometheus monitoring"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "591045e5-1796-4dcf-8310-0482c9b3d461",
+    "fields": {
+      "canonical_name": "Datadog",
+      "aliases": [
+        "Datadog APM"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0c4c174c-1c1d-48bd-9582-b15ac0adde79",
+    "fields": {
+      "canonical_name": "Sentry",
+      "aliases": [
+        "Sentry error tracking"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "f5582043-d9b7-4ddd-a7ba-2d8ce436c816",
+    "fields": {
+      "canonical_name": "New Relic",
+      "aliases": [
+        "NewRelic"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "98f5f02a-bcaa-4144-bfc3-f22fe0137a4b",
+    "fields": {
+      "canonical_name": "SonarQube",
+      "aliases": [
+        "Sonar"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a64097de-1212-427a-8907-d4deb4083d09",
+    "fields": {
+      "canonical_name": "AWS",
+      "aliases": [
+        "Amazon Web Services",
+        "Amazon AWS"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c2948d4c-9dba-4167-9d2a-ae82db8e5dcd",
+    "fields": {
+      "canonical_name": "Azure",
+      "aliases": [
+        "Microsoft Azure",
+        "MS Azure"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "1f67a037-15d5-46af-900b-81d3d08a844a",
+    "fields": {
+      "canonical_name": "Google Cloud Platform",
+      "aliases": [
+        "GCP",
+        "Google Cloud"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "458c871b-742b-4cf8-8dba-7b8c65370cbe",
+    "fields": {
+      "canonical_name": "AWS Lambda",
+      "aliases": [
+        "Lambda"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "ef78cc55-73ef-4275-931e-17383a113b8b",
+    "fields": {
+      "canonical_name": "Amazon S3",
+      "aliases": [
+        "S3",
+        "AWS S3"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "31e7cc44-d939-4e53-864b-21be8eac30d2",
+    "fields": {
+      "canonical_name": "Amazon EC2",
+      "aliases": [
+        "EC2"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "5c5423c9-4835-4616-97b8-b637aa8c686c",
+    "fields": {
+      "canonical_name": "Amazon RDS",
+      "aliases": [
+        "RDS",
+        "AWS RDS"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "9fa0ba61-7ba1-4642-9e18-cc84f8161ec3",
+    "fields": {
+      "canonical_name": "Amazon ECS",
+      "aliases": [
+        "ECS"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "573de353-fe35-4c78-bb96-153b231988ac",
+    "fields": {
+      "canonical_name": "Amazon EKS",
+      "aliases": [
+        "EKS",
+        "AWS Kubernetes"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "658e0d56-0393-43d2-a368-0e0b11409d87",
+    "fields": {
+      "canonical_name": "AWS CloudFormation",
+      "aliases": [
+        "CloudFormation"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "ccfd05f3-88fd-4164-97b5-54a8f1a55c73",
+    "fields": {
+      "canonical_name": "Azure DevOps",
+      "aliases": [
+        "ADO",
+        "Azure Pipelines"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "137d23e9-9597-40a2-9fdb-df0b0f7ec27c",
+    "fields": {
+      "canonical_name": "Azure Functions",
+      "aliases": [
+        "Azure Serverless"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d4daafb8-013d-458d-909e-bda03c71e816",
+    "fields": {
+      "canonical_name": "Google Kubernetes Engine",
+      "aliases": [
+        "GKE"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8d2d6cfb-25ec-4b64-b809-66ff587f8eec",
+    "fields": {
+      "canonical_name": "Cloud Run",
+      "aliases": [
+        "GCP Cloud Run"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "ce6308f8-8394-490e-bb9b-a043f8d776b8",
+    "fields": {
+      "canonical_name": "Cloudflare",
+      "aliases": [
+        "CF",
+        "Cloudflare CDN"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "fd186ebb-df63-4f18-9832-71b3126872e5",
+    "fields": {
+      "canonical_name": "Vercel",
+      "aliases": [
+        "Vercel deploy"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "db834200-9f99-4421-abd4-33bd6863d940",
+    "fields": {
+      "canonical_name": "Netlify",
+      "aliases": [
+        "Netlify deploy"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0b8f729d-741b-410e-976f-523b3799501a",
+    "fields": {
+      "canonical_name": "Heroku",
+      "aliases": [
+        "Heroku PaaS"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "7e903c42-51f4-4ae4-96ba-20f425fe8626",
+    "fields": {
+      "canonical_name": "DigitalOcean",
+      "aliases": [
+        "DO",
+        "Digital Ocean"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "1fd32a74-44d1-4276-b9e1-1369082104cb",
+    "fields": {
+      "canonical_name": "Railway",
+      "aliases": [
+        "Railway.app"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d0bb83e2-6321-40d3-850f-169f695d6b8d",
+    "fields": {
+      "canonical_name": "Render",
+      "aliases": [
+        "Render.com"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "edf550de-974a-412f-96f8-ee3d4bce4e8e",
+    "fields": {
+      "canonical_name": "Fly.io",
+      "aliases": [
+        "Flyio"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "6598ca3f-3d2f-4726-abe1-8262572ea509",
+    "fields": {
+      "canonical_name": "REST API",
+      "aliases": [
+        "RESTful API",
+        "REST APIs"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "efaa7d71-52a9-40f4-865f-702ded5fc190",
+    "fields": {
+      "canonical_name": "Microservices",
+      "aliases": [
+        "Microservice architecture"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0a9d8532-6699-428b-ac7c-a9734c7a0a78",
+    "fields": {
+      "canonical_name": "CI/CD",
+      "aliases": [
+        "Continuous Integration",
+        "Continuous Delivery"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "ddbbb0e9-dd70-49fd-80a1-e9da0c6fa4e5",
+    "fields": {
+      "canonical_name": "DevOps",
+      "aliases": [
+        "Dev Ops"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "11709acc-fad5-44c7-8f83-48076e47604a",
+    "fields": {
+      "canonical_name": "Agile",
+      "aliases": [
+        "Agile methodology",
+        "Scrum"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "942393a2-83f7-49f7-bfb9-6e2607be81c2",
+    "fields": {
+      "canonical_name": "Scrum",
+      "aliases": [
+        "Scrum framework"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "486d2362-218d-4426-b5d9-9216431070e8",
+    "fields": {
+      "canonical_name": "Kanban",
+      "aliases": [
+        "Kanban board"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "1efabfb6-5c17-4a0c-a707-4fdae50cc47d",
+    "fields": {
+      "canonical_name": "TDD",
+      "aliases": [
+        "Test Driven Development"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "336b7ba0-ce2a-4ea7-96d7-e475b1f61475",
+    "fields": {
+      "canonical_name": "BDD",
+      "aliases": [
+        "Behavior Driven Development"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "360893d9-0ab9-4eef-a258-b0500ba32ea3",
+    "fields": {
+      "canonical_name": "OOP",
+      "aliases": [
+        "Object Oriented Programming"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "1921760a-0a62-49a0-a60b-00955a25a2bb",
+    "fields": {
+      "canonical_name": "Functional Programming",
+      "aliases": [
+        "FP"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0efbf4ad-bdcd-4415-978c-5dbb1ab45044",
+    "fields": {
+      "canonical_name": "Design Patterns",
+      "aliases": [
+        "GoF patterns",
+        "Gang of Four"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "fdfaf42a-d7a6-48a0-b598-94853e27bb65",
+    "fields": {
+      "canonical_name": "SOLID Principles",
+      "aliases": [
+        "SOLID"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "2c01a8f0-2fbc-4d4c-a889-cfbb674bcb32",
+    "fields": {
+      "canonical_name": "System Design",
+      "aliases": [
+        "Distributed systems design"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "33820574-4593-4eac-a0da-edfb4c55573f",
+    "fields": {
+      "canonical_name": "Data Structures",
+      "aliases": [
+        "DSA",
+        "Data Structures and Algorithms"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "6474ad3c-ade1-42fd-9ee7-12ad9673516e",
+    "fields": {
+      "canonical_name": "Algorithms",
+      "aliases": [
+        "Algorithm design"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "98ed0d57-8a6b-4b3e-8560-e4e0af5849ff",
+    "fields": {
+      "canonical_name": "Machine Learning",
+      "aliases": [
+        "ML"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "f763cfc9-9c8c-4979-b9c8-c259dbf117de",
+    "fields": {
+      "canonical_name": "Deep Learning",
+      "aliases": [
+        "DL",
+        "Neural Networks"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8aa76c59-3434-4d1d-bb4d-eb2253f7bcaf",
+    "fields": {
+      "canonical_name": "Natural Language Processing",
+      "aliases": [
+        "NLP"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "f639c279-c8df-4812-a8f3-49efde9088ea",
+    "fields": {
+      "canonical_name": "Computer Vision",
+      "aliases": [
+        "CV",
+        "Image Recognition"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8ed5e96b-beb8-41cb-b8b2-ebfebb1121de",
+    "fields": {
+      "canonical_name": "Data Engineering",
+      "aliases": [
+        "Data pipelines"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "88f32ab9-aba8-4985-b602-b50ddd8c82af",
+    "fields": {
+      "canonical_name": "Data Science",
+      "aliases": [
+        "DS"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "2efcf69c-d2a0-44fe-9651-f16839558cf5",
+    "fields": {
+      "canonical_name": "ETL",
+      "aliases": [
+        "Extract Transform Load"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "9b23fa2d-d836-4fb1-95e2-e585b92a66b6",
+    "fields": {
+      "canonical_name": "Event-Driven Architecture",
+      "aliases": [
+        "EDA",
+        "Event driven"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d8caf36e-3c7e-40ef-b0cc-b5ff35fda79a",
+    "fields": {
+      "canonical_name": "Domain-Driven Design",
+      "aliases": [
+        "DDD"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "f3fd036f-ecc6-45b7-b28b-66ee08b43742",
+    "fields": {
+      "canonical_name": "Clean Architecture",
+      "aliases": [
+        "Uncle Bob architecture"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "85bad04c-535c-4063-9587-7a03a82aee56",
+    "fields": {
+      "canonical_name": "MVC",
+      "aliases": [
+        "Model View Controller"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "2b22bdc5-c269-486a-9a4b-aad9ca6842a7",
+    "fields": {
+      "canonical_name": "MVVM",
+      "aliases": [
+        "Model View ViewModel"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "6f0b23cd-8fe6-4345-8705-f711bffe4be8",
+    "fields": {
+      "canonical_name": "WebSockets",
+      "aliases": [
+        "WebSocket",
+        "WS"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "58615265-bede-4744-a621-5bd87741caec",
+    "fields": {
+      "canonical_name": "OAuth 2.0",
+      "aliases": [
+        "OAuth",
+        "OAuth2"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "e1fe00c3-a916-4ae4-aaba-666337bc72fe",
+    "fields": {
+      "canonical_name": "JWT",
+      "aliases": [
+        "JSON Web Token",
+        "JSON Web Tokens"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a2bed2dc-d0da-4ff9-9970-7ddc5da516a7",
+    "fields": {
+      "canonical_name": "RBAC",
+      "aliases": [
+        "Role Based Access Control"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "3db80880-76b0-424a-9150-bc4933c21e37",
+    "fields": {
+      "canonical_name": "SEO",
+      "aliases": [
+        "Search Engine Optimization"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "6b57023d-66e4-4213-b8e9-0a41e06899d1",
+    "fields": {
+      "canonical_name": "Accessibility",
+      "aliases": [
+        "a11y",
+        "WCAG"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "3f8827b0-754a-40e8-8127-c4fd9d5afb0b",
+    "fields": {
+      "canonical_name": "Responsive Design",
+      "aliases": [
+        "Mobile first design"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "74fe101d-353b-4fc1-9eac-d327879f6c96",
+    "fields": {
+      "canonical_name": "API Design",
+      "aliases": [
+        "API architecture"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "2c895f6b-6ad8-4598-b0b8-3348c118b5c3",
+    "fields": {
+      "canonical_name": "Caching",
+      "aliases": [
+        "Cache strategies"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "26ea8497-88b1-4cdc-86ac-5ea2236733da",
+    "fields": {
+      "canonical_name": "Load Balancing",
+      "aliases": [
+        "Load balancer"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "68d80a03-d88b-4cb8-ae5b-a0ec767c0847",
+    "fields": {
+      "canonical_name": "High Availability",
+      "aliases": [
+        "HA"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "e3179d7f-c51e-4603-97c0-941c339e30a5",
+    "fields": {
+      "canonical_name": "Disaster Recovery",
+      "aliases": [
+        "DR"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "af9c8cd4-4620-4531-8086-03d47ee2de1e",
+    "fields": {
+      "canonical_name": "Information Security",
+      "aliases": [
+        "InfoSec",
+        "Cybersecurity"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "6128371f-754e-4ab5-96b1-85462facfbec",
+    "fields": {
+      "canonical_name": "Penetration Testing",
+      "aliases": [
+        "Pen testing",
+        "Pentest"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c507c46a-44e8-4370-bae5-01352b51a0fa",
+    "fields": {
+      "canonical_name": "Communication",
+      "aliases": [
+        "Verbal communication",
+        "Written communication"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "f6a78cb7-8cdc-486d-8d4e-a6c8f4a35dd4",
+    "fields": {
+      "canonical_name": "Leadership",
+      "aliases": [
+        "Team leadership"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "da4d923e-705a-432b-ae13-fba693b786bd",
+    "fields": {
+      "canonical_name": "Problem Solving",
+      "aliases": [
+        "Analytical thinking"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "b869d65a-da4a-40e2-9219-314ba6dfc041",
+    "fields": {
+      "canonical_name": "Critical Thinking",
+      "aliases": [
+        "Critical analysis"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "fdacfe4d-2b7d-4bcf-8bc5-df12e90a8543",
+    "fields": {
+      "canonical_name": "Teamwork",
+      "aliases": [
+        "Collaboration",
+        "Team collaboration"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "865232e0-6da7-45fe-b476-5589b7f3866b",
+    "fields": {
+      "canonical_name": "Time Management",
+      "aliases": [
+        "Prioritization"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "5616468e-00bc-4dfb-9c79-2398a8a6c036",
+    "fields": {
+      "canonical_name": "Adaptability",
+      "aliases": [
+        "Flexibility"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c76410dd-c7cd-4c0a-a48a-9abd1d868f34",
+    "fields": {
+      "canonical_name": "Creativity",
+      "aliases": [
+        "Creative thinking"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0858d2d0-d329-47ef-9847-c8291384aa0f",
+    "fields": {
+      "canonical_name": "Public Speaking",
+      "aliases": [
+        "Presentation skills"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "39e50ac2-9ba6-4056-a31d-8a50afa2575b",
+    "fields": {
+      "canonical_name": "Negotiation",
+      "aliases": [
+        "Negotiation skills"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "ef2dc4a1-2439-4f64-8872-c8ed4178a57b",
+    "fields": {
+      "canonical_name": "Conflict Resolution",
+      "aliases": [
+        "Mediation"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d9488e68-f3a2-4190-bc70-3bab9536745d",
+    "fields": {
+      "canonical_name": "Emotional Intelligence",
+      "aliases": [
+        "EQ",
+        "EI"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c9aac57c-5cce-4089-b8d8-b9ac07f132cc",
+    "fields": {
+      "canonical_name": "Mentoring",
+      "aliases": [
+        "Coaching",
+        "Mentorship"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8807341e-e74d-48dd-b219-67d9e041b2f6",
+    "fields": {
+      "canonical_name": "Project Management",
+      "aliases": [
+        "PM skills"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "cb45e470-bae3-49d6-96b6-ed3a081f7d7e",
+    "fields": {
+      "canonical_name": "Stakeholder Management",
+      "aliases": [
+        "Stakeholder communication"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8dea1a41-2393-436f-9311-c6f2f50441af",
+    "fields": {
+      "canonical_name": "Attention to Detail",
+      "aliases": [
+        "Detail oriented"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "7eebac57-c27f-402d-9a82-b46c9acb3ad7",
+    "fields": {
+      "canonical_name": "Work Ethic",
+      "aliases": [
+        "Strong work ethic"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "25863d21-0840-451d-a947-4a756ba6c48a",
+    "fields": {
+      "canonical_name": "Self-Motivation",
+      "aliases": [
+        "Self motivated"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "2111ad6a-c374-43bd-9553-c14703e32ef3",
+    "fields": {
+      "canonical_name": "Decision Making",
+      "aliases": [
+        "Decision making skills"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d66a0b88-75f4-472f-9374-cae46720ac68",
+    "fields": {
+      "canonical_name": "Strategic Thinking",
+      "aliases": [
+        "Strategic planning"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "235bd159-0754-43cd-b9bf-9552ca622bb5",
+    "fields": {
+      "canonical_name": "Cross-functional Collaboration",
+      "aliases": [
+        "Cross team collaboration"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c9b9d189-9de1-4f84-b950-9efc1355a52a",
+    "fields": {
+      "canonical_name": "Technical Writing",
+      "aliases": [
+        "Documentation writing"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "2e594f37-b0e3-45eb-8332-c07eabc0d77b",
+    "fields": {
+      "canonical_name": "Customer Focus",
+      "aliases": [
+        "Customer centric"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0506c38a-f804-49a3-bffa-7d3e8ab7deee",
+    "fields": {
+      "canonical_name": "Innovation",
+      "aliases": [
+        "Innovative thinking"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "68705179-b7ee-4047-a1c5-cf28a07187dd",
+    "fields": {
+      "canonical_name": "Remote Collaboration",
+      "aliases": [
+        "Remote work",
+        "Distributed teams"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "fa91f4e7-c26a-4c6d-9244-76fd79da4f1d",
+    "fields": {
+      "canonical_name": "Solidity",
+      "aliases": [
+        "Solidity smart contracts"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "256457a8-b760-4cad-9d7b-b6d73362e376",
+    "fields": {
+      "canonical_name": "Clojure",
+      "aliases": [
+        "Clojure lang"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "7cb00e65-2237-4f96-8c66-35cd866f58af",
+    "fields": {
+      "canonical_name": "F#",
+      "aliases": [
+        "FSharp"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "13ebfcd4-2090-46ad-ab32-f610c1805a9d",
+    "fields": {
+      "canonical_name": "Objective-C",
+      "aliases": [
+        "ObjC"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "c25bde43-4cfa-4b56-be18-53aec2e1158c",
+    "fields": {
+      "canonical_name": "Assembly",
+      "aliases": [
+        "ASM"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "919c471f-290d-4dc9-b461-17c8dd686ece",
+    "fields": {
+      "canonical_name": "COBOL",
+      "aliases": [
+        "COBOL lang"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "07f7854d-ce89-42e4-bd93-5c0b4815d06b",
+    "fields": {
+      "canonical_name": "Groovy",
+      "aliases": [
+        "Apache Groovy"
+      ],
+      "category": "Languages",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "74709f21-9d26-4a82-b327-78c94bc28ecb",
+    "fields": {
+      "canonical_name": "Remix",
+      "aliases": [
+        "Remix.run"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "2757cd96-db56-4478-914d-0a4878612bb6",
+    "fields": {
+      "canonical_name": "Astro",
+      "aliases": [
+        "Astro framework"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "7f2decda-bacb-49b2-a8a4-b18c3d1acf9e",
+    "fields": {
+      "canonical_name": "Ember.js",
+      "aliases": [
+        "Ember"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "9c319d24-54fa-4f90-b332-b5de87b23556",
+    "fields": {
+      "canonical_name": "Backbone.js",
+      "aliases": [
+        "Backbone"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a72783c6-de35-467a-bb41-e9103bf78871",
+    "fields": {
+      "canonical_name": "jQuery",
+      "aliases": [
+        "jquery"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d5889ed1-c387-486b-b87d-1c86cc64dde1",
+    "fields": {
+      "canonical_name": "Three.js",
+      "aliases": [
+        "ThreeJS",
+        "3D WebGL"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "16b0cae5-0da3-4822-8dab-4ba88c45a3a0",
+    "fields": {
+      "canonical_name": "D3.js",
+      "aliases": [
+        "D3",
+        "Data visualization"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "e246cef0-4b2a-4209-9396-ee0b5ddf9bd8",
+    "fields": {
+      "canonical_name": "Streamlit",
+      "aliases": [
+        "Streamlit apps"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "8fc1d406-a443-47d1-9f1a-9e3cbbbc0fc4",
+    "fields": {
+      "canonical_name": "Dash",
+      "aliases": [
+        "Plotly Dash"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "da05cd1b-94cb-4ad4-ab00-296f2e917cc9",
+    "fields": {
+      "canonical_name": "Keras",
+      "aliases": [
+        "Keras DL"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "11fac94b-d2a2-4a7d-9855-6f5b7894e666",
+    "fields": {
+      "canonical_name": "XGBoost",
+      "aliases": [
+        "XGB"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0a180632-9e10-4446-9300-19c5438968ee",
+    "fields": {
+      "canonical_name": "LightGBM",
+      "aliases": [
+        "LGBM"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "4a701e6e-adc9-491b-8130-549084a5f5e4",
+    "fields": {
+      "canonical_name": "Prisma",
+      "aliases": [
+        "Prisma ORM"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "97afc4e2-0c72-4cbb-83b0-9de0abb8ba8b",
+    "fields": {
+      "canonical_name": "Sequelize",
+      "aliases": [
+        "Sequelize ORM"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "eba9f66b-b7b4-46cc-afaa-dd0e99958b3e",
+    "fields": {
+      "canonical_name": "SQLAlchemy",
+      "aliases": [
+        "SQL Alchemy"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": true
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "b6f49f28-494f-4b7c-9cb4-dfa63ae90776",
+    "fields": {
+      "canonical_name": "Hibernate",
+      "aliases": [
+        "Hibernate ORM"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "b3332068-52b1-4f39-ba1f-33b1c85f0e07",
+    "fields": {
+      "canonical_name": "TypeORM",
+      "aliases": [
+        "Type ORM"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "caf4a343-8491-4362-a803-d104208ffa88",
+    "fields": {
+      "canonical_name": "Mongoose",
+      "aliases": [
+        "Mongoose ODM"
+      ],
+      "category": "Frameworks",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "ca4f796e-5faf-49e9-9f39-79e8d9d85c97",
+    "fields": {
+      "canonical_name": "PlanetScale",
+      "aliases": [
+        "PlanetScale DB"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "1612699b-b7c8-4c95-b27a-9b2a647fd132",
+    "fields": {
+      "canonical_name": "CockroachDB",
+      "aliases": [
+        "Cockroach DB"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "836e078f-a2a2-4dde-a6a4-bc54e6bb0182",
+    "fields": {
+      "canonical_name": "TimescaleDB",
+      "aliases": [
+        "Timescale"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "9a57059c-1afe-4f2b-ba4e-7f84e805cdf9",
+    "fields": {
+      "canonical_name": "ArangoDB",
+      "aliases": [
+        "Arango DB"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "f7c8434e-293e-484a-b0bf-94e0b7560136",
+    "fields": {
+      "canonical_name": "Memcached",
+      "aliases": [
+        "Memcache"
+      ],
+      "category": "Databases",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "390fb001-d77f-4696-9ad5-92917013076f",
+    "fields": {
+      "canonical_name": "Vault",
+      "aliases": [
+        "HashiCorp Vault"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "eea520a5-b739-4a90-9fcf-bce350562c18",
+    "fields": {
+      "canonical_name": "Consul",
+      "aliases": [
+        "HashiCorp Consul"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "50938e95-2181-4f73-8500-c4dd089c91b8",
+    "fields": {
+      "canonical_name": "Packer",
+      "aliases": [
+        "HashiCorp Packer"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "7a736070-8ae5-4206-9fa5-e3aa7e08871b",
+    "fields": {
+      "canonical_name": "Helm",
+      "aliases": [
+        "Helm charts"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d2f5e109-0a40-4dd2-b1cc-4e1f1400ea68",
+    "fields": {
+      "canonical_name": "ArgoCD",
+      "aliases": [
+        "Argo CD"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "7a56846e-d530-4269-bc99-19e0d6911e30",
+    "fields": {
+      "canonical_name": "Istio",
+      "aliases": [
+        "Istio service mesh"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d844520f-2bef-42e3-ad9a-3f0eeb2efd6f",
+    "fields": {
+      "canonical_name": "Traefik",
+      "aliases": [
+        "Traefik proxy"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "0167254c-bcbe-4576-9b6f-12e48e2b22b6",
+    "fields": {
+      "canonical_name": "HAProxy",
+      "aliases": [
+        "HA Proxy"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a6de7257-53f4-4979-a4d8-d7df0dc9d763",
+    "fields": {
+      "canonical_name": "Vagrant",
+      "aliases": [
+        "Vagrant VMs"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "88190fab-b05c-4836-ba5c-27da4db8456c",
+    "fields": {
+      "canonical_name": "Pulumi",
+      "aliases": [
+        "Pulumi IaC"
+      ],
+      "category": "Tools",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "974a834f-29be-4b16-8658-9bc6553a3f4e",
+    "fields": {
+      "canonical_name": "AWS CDK",
+      "aliases": [
+        "CDK",
+        "Cloud Development Kit"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "cc62ebf4-b5ce-4108-a2a7-cc04f60d4e1e",
+    "fields": {
+      "canonical_name": "Serverless Framework",
+      "aliases": [
+        "Serverless",
+        "SLS"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "ad5dd1b8-a2cb-4cca-97d9-edd1b8a7a61d",
+    "fields": {
+      "canonical_name": "SAM",
+      "aliases": [
+        "AWS SAM"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "682b152d-6156-43bb-9e3d-44ca3c05e6f1",
+    "fields": {
+      "canonical_name": "OpenShift",
+      "aliases": [
+        "Red Hat OpenShift"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "d292b30c-7337-42a1-be43-69607fca9626",
+    "fields": {
+      "canonical_name": "OpenStack",
+      "aliases": [
+        "Open Stack"
+      ],
+      "category": "Cloud",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "a9034149-5f6e-405c-9f8a-0e4dd29552bd",
+    "fields": {
+      "canonical_name": "Service Mesh",
+      "aliases": [
+        "Service mesh patterns"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "eeaa1608-aa3e-402d-8959-b18acd8fe145",
+    "fields": {
+      "canonical_name": "CQRS",
+      "aliases": [
+        "Command Query Responsibility Segregation"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "4cf7a15c-39cc-469b-820c-400841bd2ea7",
+    "fields": {
+      "canonical_name": "Hexagonal Architecture",
+      "aliases": [
+        "Ports and adapters"
+      ],
+      "category": "Concepts",
+      "logo_url": null,
+      "is_popular": false
+    }
+  },
+  {
+    "model": "cv_builder.skillcanonical",
+    "pk": "dbc885c9-8bad-4f27-bdaa-1119ee468810",
+    "fields": {
+      "canonical_name": "Pair Programming",
+      "aliases": [
+        "Pairing"
+      ],
+      "category": "Soft Skills",
+      "logo_url": null,
+      "is_popular": false
+    }
+  }
+]
