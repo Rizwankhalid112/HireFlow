@@ -34,6 +34,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'apps.accounts',
+    'apps.cv_builder',
     'apps.analytics',
     'apps.reports',
     'apps.settings_app',
