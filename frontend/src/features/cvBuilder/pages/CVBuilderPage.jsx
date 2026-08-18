@@ -11,6 +11,7 @@ import { ExperienceStep } from '../components/steps/ExperienceStep';
 import { ExtrasStep } from '../components/steps/ExtrasStep';
 import { ProjectsStep } from '../components/steps/ProjectsStep';
 import { SkillsStep } from '../components/steps/SkillsStep';
+import { TemplateStep } from '../components/steps/TemplateStep';
 import { STEPS } from '../constants';
 
 export default function CVBuilderPage() {
@@ -72,6 +73,8 @@ export default function CVBuilderPage() {
         return <ProjectsStep />;
       case 'extras':
         return <ExtrasStep />;
+      case 'template':
+        return <TemplateStep profile={profile} />;
       default:
         return null;
     }
@@ -91,6 +94,10 @@ export default function CVBuilderPage() {
           </div>
           <div className="w-full max-w-sm">
             <CompletionBar score={score} isComplete={isComplete} />
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+              Every section saves as soon as you add or edit an entry — there is no separate save
+              step outside Contact &amp; Summary.
+            </p>
           </div>
         </div>
       </Card>
@@ -103,6 +110,11 @@ export default function CVBuilderPage() {
 
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
         <Card className="h-fit lg:sticky lg:top-6">
+          {/* Repeated here because the header card scrolls out of view while
+              you work, and the score is the main feedback that a save landed. */}
+          <div className="mb-4 border-b border-slate-200 pb-4 dark:border-slate-800">
+            <CompletionBar score={score} isComplete={isComplete} />
+          </div>
           <StepNavigator
             activeStep={activeStep}
             onStepChange={setActiveStep}

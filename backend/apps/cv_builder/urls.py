@@ -17,6 +17,12 @@ from apps.cv_builder.views.project import (
     ProjectListCreateView,
     ProjectReorderView,
 )
+from apps.cv_builder.views.template import (
+    CVPhotoView,
+    CVPreviewMetaView,
+    CVPreviewView,
+    TemplateListView,
+)
 from apps.cv_builder.views.skill import (
     SkillBulkAddView,
     SkillDetailView,
@@ -36,6 +42,10 @@ from apps.cv_builder.views.work_experience import (
 urlpatterns = [
     path('profile/', CVProfileView.as_view(), name='cv-profile'),
     path('profile/completion/', CVProfileCompletionView.as_view(), name='cv-profile-completion'),
+    path('photo/', CVPhotoView.as_view(), name='cv-photo'),
+    path('templates/', TemplateListView.as_view(), name='cv-template-list'),
+    path('preview/', CVPreviewView.as_view(), name='cv-preview'),
+    path('preview/meta/', CVPreviewMetaView.as_view(), name='cv-preview-meta'),
     path('work-experience/', WorkExperienceListCreateView.as_view(), name='cv-work-experience-list'),
     path('work-experience/reorder/', WorkExperienceReorderView.as_view(), name='cv-work-experience-reorder'),
     path('work-experience/<uuid:pk>/', WorkExperienceDetailView.as_view(), name='cv-work-experience-detail'),

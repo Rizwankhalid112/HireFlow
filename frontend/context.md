@@ -397,6 +397,12 @@ features/cvBuilder/
 
 **Cache invalidation.** Every section write goes through `useSectionMutation`, which invalidates that section's list plus `cvKeys.profile` and `cvKeys.completion`, because any child write changes the score. Bullet writes invalidate the *experience* list, since bullets arrive nested there.
 
+**Two different save models, and the UI must say so.** Contact & Summary autosaves and has an explicit "Save section" button. Every other section writes immediately on add/edit — there is no save button because there is nothing to defer. That asymmetry reads as data loss if unlabelled, so `SectionShell` shows a "Saves automatically" badge by default (`autosaves={false}` on Contact), and every mutation toasts on success. Skills and bullets originally saved silently; don't remove those toasts.
+
+**Why the score looks stalled.** Scoring is all-or-nothing per section: an experience with one bullet scores 0 of 25, and four skills score 0 of 15. `STEPS` in `constants.js` carries `points` and `requirement` per step purely so the navigator can explain this. Those numbers mirror `services/completion.py` (25/10/25/15/15/10, complete at 75) — if the backend weights change, change them here too. The completion bar is rendered twice, in the header and in the sticky nav card, because the header scrolls out of view while editing and the score is the main signal that a write landed.
+
+**Invalidation uses `refetchType: 'all'`.** The React Query default (`'active'`) skips disabled or unmounted observers, which can leave the completion bar showing a stale score after a write. Don't drop it.
+
 **Autosave applies to the profile only.** Child resources expose no PATCH, so they use explicit save. Two non-obvious details in `useAutosave`, both worth preserving: it subscribes to RHF's `watch` rather than `isDirty` (which latches `true` and would silence every save after the first), and it gates on `profileSchema.safeParse` so a half-typed URL never fires a PATCH that 400s invisibly. Failed saves back up to `sessionStorage`; `ContactStep` reads that back on mount and offers a recovery banner.
 
 **Reorder is buttons, not drag-and-drop.** Deliberate: the backend rejects the whole batch if any id fails the ownership check, so the full ordered array must always be sent — `useReorder` does exactly that. It also avoids a new dependency and is keyboard-accessible. Swap in `@dnd-kit` later if you want, but keep sending the complete list.

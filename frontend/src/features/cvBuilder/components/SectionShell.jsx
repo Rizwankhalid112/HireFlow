@@ -1,11 +1,27 @@
 import { Card, Spinner } from '@/components/ui';
 
-export function SectionShell({ title, description, action, isLoading, children }) {
+/* `autosaves` is on by default: every section except Contact & Summary writes
+   immediately on add/edit, and users read a missing save button as data loss. */
+export function SectionShell({
+  title,
+  description,
+  action,
+  isLoading,
+  autosaves = true,
+  children,
+}) {
   return (
     <Card>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
+            {autosaves ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200">
+                ✓ Saves automatically
+              </span>
+            ) : null}
+          </div>
           {description ? (
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{description}</p>
           ) : null}

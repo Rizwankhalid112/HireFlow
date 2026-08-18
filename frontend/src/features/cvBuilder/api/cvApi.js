@@ -76,3 +76,27 @@ export const updateLanguage = (id, payload) => api.put(`/cv/languages/${id}/`, p
 export const deleteLanguage = (id) => api.delete(`/cv/languages/${id}/`);
 export const reorderLanguages = (orderedIds) =>
   api.patch('/cv/languages/reorder/', { ordered_ids: orderedIds });
+
+// --- Templates, preview, photo -----------------------------------------------
+export const listTemplates = () => api.get('/cv/templates/');
+
+/* arraybuffer, not blob: PdfCanvas hands the bytes straight to pdf.js. */
+export const getPreviewPdf = (templateId) =>
+  api.get('/cv/preview/', {
+    params: templateId ? { template: templateId } : undefined,
+    responseType: 'arraybuffer',
+  });
+
+export const getPreviewMeta = (templateId) =>
+  api.get('/cv/preview/meta/', {
+    params: templateId ? { template: templateId } : undefined,
+  });
+
+export const uploadPhoto = (file) => {
+  const form = new FormData();
+  form.append('photo', file);
+  // Let the browser set the multipart boundary.
+  return api.post('/cv/photo/', form, { headers: { 'Content-Type': undefined } });
+};
+
+export const deletePhoto = () => api.delete('/cv/photo/');

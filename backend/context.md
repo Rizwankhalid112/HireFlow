@@ -35,6 +35,7 @@ The CV Builder is being built against a 10-step spec at `docs/cv_builder_spec.md
 | django-celery-beat | 2.7.0 | DB-backed scheduler |
 | gunicorn | 23.0.0 | prod WSGI server |
 | whitenoise | 6.8.2 | static file serving |
+| weasyprint | 66.0 | CV template → PDF (needs Pango; see Dockerfile) |
 | Pillow | 11.1.0 | avatar `ImageField` |
 | requests | 2.32.3 | OAuth userinfo calls |
 
@@ -80,7 +81,10 @@ Note: `apps.applications` and `apps.notifications` exist on disk but are **not**
 
 **Other** — Postgres via `DB_*` env vars (no `CONN_MAX_AGE`). Celery JSON-only, UTC. `CORS_ALLOW_CREDENTIALS = True` (needed for the refresh cookie). `USE_X_FORWARDED_HOST` + `SECURE_PROXY_SSL_HEADER`. Email backend defaults to console. Custom `FRONTEND_URL` builds verify/reset/reminder links.
 
-**Not configured:** `CACHES` (so `skill_detector`'s cache is per-process LocMem, never shared or invalidated), `LOGGING`, `CSRF_TRUSTED_ORIGINS`, `SECURE_HSTS_*`, `DATA_UPLOAD_MAX_MEMORY_SIZE`.
+**Configured 2026-08-18:** `CACHES` → Redis db 2 (db 0 is the Celery broker, db 1 the result
+backend). Required for the PDF render cache to work across gunicorn workers.
+
+**Not configured:** `LOGGING`, `CSRF_TRUSTED_ORIGINS`, `SECURE_HSTS_*`, `DATA_UPLOAD_MAX_MEMORY_SIZE`.
 
 ### URL root — [config/urls.py](config/urls.py)
 
@@ -258,6 +262,35 @@ Auth is the global `IsAuthenticated` default (Bearer access token in the `Author
 | GET / POST · PATCH reorder · PUT/DELETE `<uuid:pk>` | `/api/cv/languages/` | Same shape |
 
 URL-ordering detail: `skills/search/`, `skills/bulk-add/`, and `skills/reorder/` are registered **before** `skills/` and `skills/<uuid:pk>/` so the literal segments aren't shadowed. Keep that ordering when adding routes.
+
+### Templates & PDF (built 2026-08-18)
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/api/cv/templates/` | Registry: id, name, description, columns, ats_safe, photo, max_pages |
+| GET | `/api/cv/preview/?template=<id>` | `application/pdf` inline — the rendered CV |
+| GET | `/api/cv/preview/meta/?template=<id>` | `{page_count, max_pages, overflows}` |
+| POST / DELETE | `/api/cv/photo/` | Upload / clear the CV photo (multipart) |
+
+**Preview and download are the same bytes.** `services/pdf_renderer.render_cv_pdf()` is the only
+render path; both endpoints return its output from the same Redis cache entry, differing only in
+`Content-Disposition`. Never add a second renderer — a browser-side HTML preview would diverge
+from the PDF on line breaks and therefore page breaks.
+
+Six templates live in `templates/cv_templates/`, resolved through
+[templates_registry.py](apps/cv_builder/templates_registry.py) — **an allowlist, never string
+interpolation into a path**. `minimal`, `classic`, `technical`, `compact` are one-column and
+ATS-safe; `modern` (two-column sidebar, not ATS-safe) and `executive` (header band, ATS-safe) are
+the only two with a photo. `_sections.html` holds the shared body markup; each template supplies
+its own CSS for the same class names.
+
+Photo handling in `serializers/photo.py`: validates by decoding, 2 MB cap, re-encodes to 600×600
+JPEG which **strips EXIF** (phone photos carry GPS, and a CV gets emailed to strangers). The
+context builder passes a `file://` URI, not `photo.url` — `MEDIA_URL` gives a leading-slash path
+that resolves against the filesystem root, so WeasyPrint would silently render no image.
+
+Overflow is measured, not estimated: `len(document.pages)` from the laid-out document. Nothing is
+ever truncated — the UI warns instead.
 
 **Specified but not implemented:** `POST /api/cv/upload/`, `GET /api/cv/upload/{log_id}/status/`, `POST /api/cv/upload/{log_id}/apply/`, `POST /api/cv/export/pdf/`, `GET /api/cv/export/status/`, `GET /api/cv/export/download/`.
 

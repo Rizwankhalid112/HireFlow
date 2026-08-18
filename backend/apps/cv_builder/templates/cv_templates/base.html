@@ -1,0 +1,48 @@
+{% comment %}
+Shared skeleton for every CV template.
+
+House rules for the stylesheets that extend this:
+  - Flexbox for layout (fully supported by WeasyPrint since v66).
+  - Grid only for simple row/column cases. No subgrid, no complex areas.
+  - break-inside: avoid on every entry so items never split across a page.
+  - Never rely on a system font; declare the stack explicitly.
+{% endcomment %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ full_name|default:"CV" }}</title>
+<style>
+  @page {
+    size: A4;
+    margin: {% block page_margin %}14mm 15mm{% endblock %};
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    /* DejaVu is guaranteed present in the image; the rest are for parity when
+       a designer previews the raw HTML on a workstation. */
+    font-family: "DejaVu Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.4;
+    color: #1e293b;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  h1, h2, h3 { margin: 0; font-weight: 700; }
+
+  /* Nothing should ever be cut in half by a page boundary. */
+  .entry, .section-title, li { break-inside: avoid; }
+  .section { break-inside: auto; }
+
+  {% block styles %}{% endblock %}
+</style>
+</head>
+<body>
+{% block body %}{% endblock %}
+</body>
+</html>

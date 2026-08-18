@@ -125,6 +125,7 @@ export function ContactStep({ profile }) {
     <SectionShell
       title="Contact & Summary"
       description="How employers reach you, plus the summary the AI tailors per application."
+      autosaves={false}
       action={<SaveStatus status={autosave.status} lastSavedAt={autosave.lastSavedAt} />}
     >
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">

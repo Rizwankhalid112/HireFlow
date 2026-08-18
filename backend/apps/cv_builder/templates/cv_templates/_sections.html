@@ -1,0 +1,84 @@
+{% comment %}
+Shared body sections. Templates that use the standard vertical order include
+this; ones with a bespoke layout (modern's sidebar) compose the parts directly.
+
+Every template supplies its own CSS for these class names, so the markup stays
+identical while the look changes completely.
+{% endcomment %}
+
+{% if experiences %}
+  <div class="section">
+    <div class="section-title">Experience</div>
+    {% for experience in experiences %}
+      <div class="entry">
+        <div class="entry-head">
+          <div>
+            <div class="entry-title">{{ experience.role_title }}</div>
+            <div class="entry-sub">
+              {{ experience.company_name }}{% if experience.location %} · {{ experience.location }}{% endif %}{% if experience.employment_type %} · {{ experience.employment_type }}{% endif %}
+            </div>
+          </div>
+          <div class="entry-date">{{ experience.date_range }}</div>
+        </div>
+        {% if experience.bullets %}
+          <ul class="bullets">
+            {% for bullet in experience.bullets %}<li>{{ bullet }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if education %}
+  <div class="section">
+    <div class="section-title">Education</div>
+    {% for entry in education %}
+      <div class="entry">
+        <div class="entry-head">
+          <div>
+            <div class="entry-title">{{ entry.degree }}</div>
+            <div class="entry-sub">
+              {{ entry.institution }}{% if entry.cgpa %} · CGPA {{ entry.cgpa }}{% endif %}
+            </div>
+          </div>
+          <div class="entry-date">{{ entry.date_range }}</div>
+        </div>
+        {% if entry.thesis_title %}<div class="tech">Thesis: {{ entry.thesis_title }}</div>{% endif %}
+        {% if entry.achievements %}<div class="tech">{{ entry.achievements }}</div>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if projects %}
+  <div class="section">
+    <div class="section-title">Projects</div>
+    {% for project in projects %}
+      <div class="entry">
+        <div class="entry-head">
+          <div>
+            <div class="entry-title">{{ project.name }}</div>
+            {% if project.subtitle %}<div class="entry-sub">{{ project.subtitle }}</div>{% endif %}
+          </div>
+          <div class="entry-date">{{ project.date_range }}</div>
+        </div>
+        {% if project.description %}<div>{{ project.description }}</div>{% endif %}
+        {% if project.tech_stack %}<div class="tech">{{ project.tech_stack|join:" · " }}</div>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if certifications %}
+  <div class="section">
+    <div class="section-title">Certifications</div>
+    <ul class="meta-list">
+      {% for certification in certifications %}
+        <li>
+          <strong>{{ certification.name }}</strong>{% if certification.issuer %} — {{ certification.issuer }}{% endif %}{% if certification.date %} <span class="entry-date">({{ certification.date }})</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}

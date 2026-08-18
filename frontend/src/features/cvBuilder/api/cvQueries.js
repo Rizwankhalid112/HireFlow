@@ -24,10 +24,16 @@ export const cvKeys = {
 function useCvInvalidator() {
   const queryClient = useQueryClient();
 
+  /* refetchType 'all' matters here: the default ('active') skips any observer
+     that is disabled or unmounted, so the completion bar could keep showing a
+     stale score after a write on a step whose query was briefly inactive. */
   return (...extraKeys) => {
-    queryClient.invalidateQueries({ queryKey: cvKeys.profile });
-    queryClient.invalidateQueries({ queryKey: cvKeys.completion });
-    extraKeys.forEach((key) => queryClient.invalidateQueries({ queryKey: key }));
+    const refetch = (queryKey) =>
+      queryClient.invalidateQueries({ queryKey, refetchType: 'all' });
+
+    refetch(cvKeys.profile);
+    refetch(cvKeys.completion);
+    extraKeys.forEach(refetch);
   };
 }
 
@@ -157,6 +163,7 @@ export const useCreateBullet = () =>
     mutationFn: ({ experienceId, payload }) =>
       cvApi.createBullet(experienceId, payload).then((r) => r.data),
     invalidateKeys: [cvKeys.experiences],
+    successMessage: 'Bullet added.',
   });
 
 export const useUpdateBullet = () =>
@@ -164,12 +171,14 @@ export const useUpdateBullet = () =>
     mutationFn: ({ experienceId, bulletId, payload }) =>
       cvApi.updateBullet(experienceId, bulletId, payload).then((r) => r.data),
     invalidateKeys: [cvKeys.experiences],
+    successMessage: 'Bullet updated.',
   });
 
 export const useDeleteBullet = () =>
   useSectionMutation({
     mutationFn: ({ experienceId, bulletId }) => cvApi.deleteBullet(experienceId, bulletId),
     invalidateKeys: [cvKeys.experiences],
+    successMessage: 'Bullet removed.',
   });
 
 export const useReorderBullets = () =>
@@ -242,18 +251,21 @@ export const useCreateSkill = () =>
   useSectionMutation({
     mutationFn: (payload) => cvApi.createSkill(payload).then((r) => r.data),
     invalidateKeys: [cvKeys.skills],
+    successMessage: 'Skill added.',
   });
 
 export const useUpdateSkill = () =>
   useSectionMutation({
     mutationFn: ({ id, payload }) => cvApi.updateSkill(id, payload).then((r) => r.data),
     invalidateKeys: [cvKeys.skills],
+    successMessage: 'Skill updated.',
   });
 
 export const useDeleteSkill = () =>
   useSectionMutation({
     mutationFn: (id) => cvApi.deleteSkill(id),
     invalidateKeys: [cvKeys.skills],
+    successMessage: 'Skill removed.',
   });
 
 export const useReorderSkills = () =>
@@ -378,3 +390,66 @@ export const useReorderLanguages = () =>
     mutationFn: (orderedIds) => cvApi.reorderLanguages(orderedIds).then((r) => r.data),
     invalidateKeys: [cvKeys.languages],
   });
+
+// --- Templates, preview, photo -----------------------------------------------
+
+cvKeys.templates = ['cv', 'templates'];
+cvKeys.preview = (templateId) => ['cv', 'preview', templateId ?? 'saved'];
+cvKeys.previewMeta = (templateId) => ['cv', 'preview', 'meta', templateId ?? 'saved'];
+
+export function useTemplates() {
+  return useQuery({
+    queryKey: cvKeys.templates,
+    queryFn: () => cvApi.listTemplates().then((response) => response.data),
+    staleTime: Infinity, // static registry
+  });
+}
+
+/* Keyed by template AND content stamp so switching templates or editing the CV
+   fetches a fresh render, while flipping back to a seen template is instant. */
+export function usePreviewPdf(templateId, contentStamp, { enabled = true } = {}) {
+  return useQuery({
+    queryKey: [...cvKeys.preview(templateId), contentStamp],
+    queryFn: () => cvApi.getPreviewPdf(templateId).then((response) => response.data),
+    enabled,
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function usePreviewMeta(templateId, contentStamp, { enabled = true } = {}) {
+  return useQuery({
+    queryKey: [...cvKeys.previewMeta(templateId), contentStamp],
+    queryFn: () => cvApi.getPreviewMeta(templateId).then((response) => response.data),
+    enabled,
+    retry: false,
+  });
+}
+
+export function useUploadPhoto() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (file) => cvApi.uploadPhoto(file).then((r) => r.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cvKeys.profile });
+      queryClient.invalidateQueries({ queryKey: ['cv', 'preview'] });
+      toast.success('Photo updated.');
+    },
+    onError: onMutationError,
+  });
+}
+
+export function useDeletePhoto() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => cvApi.deletePhoto(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cvKeys.profile });
+      queryClient.invalidateQueries({ queryKey: ['cv', 'preview'] });
+      toast.success('Photo removed.');
+    },
+    onError: onMutationError,
+  });
+}
