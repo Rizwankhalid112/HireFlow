@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+/* Tailwind v4 defaults `dark:` to prefers-color-scheme. ThemeContext toggles a
+   `.dark` class on <html>, so the variant has to be redefined to follow it. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --color-primary: 79 70 229;
   --color-primary-hover: 67 56 202;

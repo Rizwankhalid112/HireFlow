@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 
 import { Button } from '@/components/ui';
 import { useTheme } from '@/context/ThemeContext';
@@ -6,8 +6,7 @@ import { useLogout, useProfile } from '@/features/auth/api/authQueries';
 
 const navItems = [
   { label: 'Dashboard', to: '/home' },
-  { label: 'Applications', to: '/home' },
-  { label: 'Analytics', to: '/home' },
+  { label: 'CV Builder', to: '/cv-builder' },
 ];
 
 export function AppLayout() {
@@ -26,13 +25,19 @@ export function AppLayout() {
           </Link>
           <nav className="mt-8 space-y-2">
             {navItems.map((item) => (
-              <Link
+              <NavLink
                 key={item.label}
                 to={item.to}
-                className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                className={({ isActive }) =>
+                  `block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-indigo-50 text-indigo-700 dark:bg-slate-800 dark:text-indigo-300'
+                      : 'text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 dark:text-slate-200 dark:hover:bg-slate-800'
+                  }`
+                }
               >
                 {item.label}
-              </Link>
+              </NavLink>
             ))}
           </nav>
         </aside>

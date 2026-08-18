@@ -39,6 +39,13 @@ class CVSkillSerializer(serializers.ModelSerializer):
             attrs['name'] = canonical.canonical_name
             attrs['category'] = canonical.category
             attrs['is_verified'] = True
+        elif self.instance and self.instance.canonical_id:
+            # Updating an already-matched skill without re-sending canonical_id
+            # (e.g. changing only proficiency) must not downgrade it to freetext.
+            # canonical_id is write-only, so a client cannot echo it back.
+            attrs['name'] = self.instance.canonical.canonical_name
+            attrs['category'] = self.instance.canonical.category
+            attrs['is_verified'] = True
         else:
             attrs['is_verified'] = False
             if not attrs.get('name'):

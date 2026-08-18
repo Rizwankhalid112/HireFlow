@@ -1,25 +1,23 @@
 import { FieldShell } from './FieldShell';
-import { Input } from './Input';
+import { Textarea } from './Textarea';
 
-export function FormField({
+export function TextareaField({
   id,
   label,
-  type = 'text',
   error,
   hint,
   registration,
   placeholder,
-  autoComplete,
+  rows,
   className,
   ...rest
 }) {
   return (
     <FieldShell id={id} label={label} error={error} hint={hint} className={className}>
-      <Input
+      <Textarea
         id={id}
-        type={type}
+        rows={rows}
         placeholder={placeholder}
-        autoComplete={autoComplete}
         error={Boolean(error)}
         {...rest}
         {...registration}

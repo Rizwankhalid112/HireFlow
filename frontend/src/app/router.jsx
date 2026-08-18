@@ -16,6 +16,7 @@ const RegisterPage = lazy(() => import('@/features/auth/pages/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('@/features/auth/pages/ForgotPasswordPage'));
 const ResetPasswordPage = lazy(() => import('@/features/auth/pages/ResetPasswordPage'));
 const VerifyEmailPage = lazy(() => import('@/features/auth/pages/VerifyEmailPage'));
+const CVBuilderPage = lazy(() => import('@/features/cvBuilder/pages/CVBuilderPage'));
 
 function PageLoader() {
   return (
@@ -46,6 +47,7 @@ export function AppRouter() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="home" element={<HomePage />} />
+            <Route path="cv-builder" element={<CVBuilderPage />} />
           </Route>
         </Route>
 
