@@ -14,6 +14,10 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // pdfjs-dist ships a web worker; Vite's pre-bundling needs it declared.
+  optimizeDeps: {
+    include: ['pdfjs-dist'],
+  },
   server: {
     host: '0.0.0.0',
     port: 5173,
