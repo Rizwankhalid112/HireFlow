@@ -35,6 +35,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'apps.accounts',
     'apps.cv_builder',
+    'apps.jobs',
     'apps.analytics',
     'apps.reports',
     'apps.settings_app',
@@ -186,6 +187,23 @@ CV_UPLOAD_STUCK_MINUTES = config('CV_UPLOAD_STUCK_MINUTES', default=5, cast=int)
 # Set explicitly rather than left to the 2.5MB default, so that where an upload
 # spills to a temp file is a decision rather than an accident.
 FILE_UPLOAD_MAX_MEMORY_SIZE = 2 * 1024 * 1024
+
+# --- Job ingestion (Module 2) -----------------------------------------------
+# We identify ourselves honestly to the boards we read. No platform we tested
+# publishes a rate limit, but undocumented is not the same as absent, so a pause
+# between requests stays in the design.
+JOBS_USER_AGENT = config(
+    'JOBS_USER_AGENT',
+    default='HireFlow/1.0 (job aggregator; +https://hireflow.com)',
+)
+JOBS_FETCH_TIMEOUT = config('JOBS_FETCH_TIMEOUT', default=45, cast=int)
+JOBS_FETCH_PAUSE = config('JOBS_FETCH_PAUSE', default=1.0, cast=float)
+# Lever runs 5-20s per company while the others are ~1s, so a serial run would
+# be dominated by it. Modest concurrency, since these are someone else's servers.
+JOBS_FETCH_WORKERS = config('JOBS_FETCH_WORKERS', default=4, cast=int)
+# Counted from when we last SAW a job in the feed, never from its posting date:
+# live listings exist that were published in 2009.
+JOBS_RETENTION_DAYS = config('JOBS_RETENTION_DAYS', default=45, cast=int)
 
 # --- Job match (Module 1) ---------------------------------------------------
 # Its own allowance rather than sharing AI_MONTHLY_CREDITS: a job match sends two

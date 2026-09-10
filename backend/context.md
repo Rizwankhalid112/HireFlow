@@ -280,6 +280,53 @@ skills, and the user is told in `payload['notes']`.
 
 ---
 
+## 6.7 `apps/jobs` — job ingestion (Module 2, day 1, built 2026-09-09)
+
+Harvests job listings from four public ATS APIs into our own table, once a day.
+Research and measurements behind every decision: [JOB_SOURCES_RND.md](../JOB_SOURCES_RND.md).
+
+```
+TrackedCompany (name, platform, slug)      ← seeded, slugs VERIFIED by live call
+      │  daily Celery Beat task, 03:00 UTC
+      ▼
+fetchers/{greenhouse,ashby,lever,workable}.py   one request per company
+      ▼  services/normalise.py                  one shape out of four
+      ▼  services/ingest.py                     bulk upsert on (source, external_id)
+   Job table  →  GET /api/jobs/  (paginated, filtered, full-text)
+```
+
+**Three schema decisions that are not obvious and must not be "simplified":**
+
+1. **Retention keys on `last_seen_at`, never `posted_at`.** Live listings exist
+   that were published in 2009 (verified). Purging on posting age deletes jobs
+   that are genuinely open. `purge_stale` also treats a window of `<= 0` as "do
+   not purge" — read literally it would mean "delete everything older than now".
+2. **`posted_at` may be older than reality, never newer.** Greenhouse's
+   `first_published` is exact for most jobs and too old for reposted ones. The
+   error is one-directional, so we under-sell freshness rather than presenting a
+   stale job as new. `is_long_running` (>365d) exists so the UI can say
+   "long-running listing" instead of "posted 6,123 days ago".
+3. **`search_vector` includes the description at weight D.** Excluding it made
+   search wrong — over 2,713 real jobs, "python" matched **one**, because
+   listings name the language in the body. Costs index size; worth it.
+
+**Performance, for a table expected to reach millions of rows:** bulk upsert
+(one statement, not one per row), a GIN index on the stored search vector,
+composite indexes matching each filter+sort the API actually issues, `only()` to
+keep multi-KB descriptions out of list queries, mandatory pagination, and
+retention to bound growth. Measured: forced through the GIN index a search runs
+0.19ms vs 10.98ms sequential.
+
+**Operational:** `manage.py seed_companies` then `manage.py fetch_jobs`.
+Companies are fetched concurrently (Lever is 5-20s per call while the others are
+~1s) and one failing company never stops the run; five consecutive failures
+disable it. `manage.py setup_job_beat_tasks` registers the nightly job.
+
+**Verified against live APIs 2026-09-09:** 13 companies, 2,714 jobs in 22s;
+re-running added no duplicates.
+
+---
+
 ## 7. Celery
 
 [celery_app/celery.py](celery_app/celery.py) is the standard three-liner: `Celery('hireflow')` → `config_from_object('django.conf:settings', namespace='CELERY')` → `autodiscover_tasks()`.
