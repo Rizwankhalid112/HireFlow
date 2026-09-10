@@ -17,6 +17,7 @@ import {
   useDeleteProject,
   useProjects,
   useReorderProjects,
+  useSuggestProjectPoints,
   useUpdateProject,
 } from '../../api/cvQueries';
 import { MAX_TECH_STACK } from '../../constants';
@@ -24,6 +25,7 @@ import { useReorder } from '../../hooks/useReorder';
 import { projectSchema } from '../../schemas/cvSchemas';
 import { parseTechStack, toAbsoluteUrl, toNullableInt } from '../../utils/payload';
 import { EntryCard } from '../EntryCard';
+import { SuggestionPanel } from '../ai/SuggestionPanel';
 import { EmptyState, SectionShell } from '../SectionShell';
 
 const EMPTY = {
@@ -191,6 +193,31 @@ export function ProjectsStep() {
   const deleteMutation = useDeleteProject();
   const reorderMutation = useReorderProjects();
 
+  /* One mutation shared across the list, so only the card the user is working
+     on shows a result — two open panels would race for the same response. */
+  const suggestMutation = useSuggestProjectPoints();
+  const [suggestingId, setSuggestingId] = useState(null);
+
+  /* Child resources expose no PATCH, so appending a point sends the whole
+     object back, exactly as the edit form does. */
+  const appendPoint = (project, text) => {
+    const description = project.description ? `${project.description}\n${text}` : text;
+    updateMutation.mutate({
+      id: project.id,
+      payload: {
+        name: project.name,
+        subtitle: project.subtitle || '',
+        description,
+        tech_stack: project.tech_stack || [],
+        project_url: project.project_url || '',
+        start_year: project.start_year ?? null,
+        end_year: project.end_year ?? null,
+        is_ongoing: Boolean(project.is_ongoing),
+        is_professional: Boolean(project.is_professional),
+      },
+    });
+  };
+
   const { moveUp, moveDown, isReordering } = useReorder(projects, reorderMutation);
 
   const handleSubmit = async (payload) => {
@@ -276,6 +303,25 @@ export function ProjectsStep() {
                     ))}
                   </div>
                 ) : null}
+
+                {/* Points are appended one at a time rather than replacing the
+                    description — a project usually needs several, and the
+                    user's own wording is worth keeping. */}
+                <SuggestionPanel
+                  key={project.id}
+                  mutation={suggestMutation}
+                  active={suggestingId === project.id}
+                  label="Suggest key points"
+                  emptyLabel="Draft from a note"
+                  needsNote={!project.description}
+                  notePlaceholder="What does it do, and what did you decide along the way?"
+                  resultKey="points"
+                  buildPayload={({ note }) => {
+                    setSuggestingId(project.id);
+                    return { project_id: project.id, note };
+                  }}
+                  onApply={(text) => appendPoint(project, text)}
+                />
               </EntryCard>
             );
           })}

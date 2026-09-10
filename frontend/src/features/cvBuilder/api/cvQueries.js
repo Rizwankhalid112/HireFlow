@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -417,12 +418,87 @@ export function usePreviewPdf(templateId, contentStamp, { enabled = true } = {})
   });
 }
 
+/* Currently unused, and deliberately so: the preview pane gets its page count
+   from pdf.js once it has parsed the document it already downloaded, and
+   compares it against `max_pages` from the template registry. Calling this
+   would mean a second server round-trip per refresh for a number we hold.
+   Kept because cvApi mirrors urls.py 1:1 and the endpoint is still live. */
 export function usePreviewMeta(templateId, contentStamp, { enabled = true } = {}) {
   return useQuery({
     queryKey: [...cvKeys.previewMeta(templateId), contentStamp],
     queryFn: () => cvApi.getPreviewMeta(templateId).then((response) => response.data),
     enabled,
     retry: false,
+  });
+}
+
+// --- AI writing suggestions --------------------------------------------------
+
+cvKeys.aiCredits = ['cv', 'ai', 'credits'];
+
+export function useSuggestionCredits() {
+  return useQuery({
+    queryKey: cvKeys.aiCredits,
+    queryFn: () => cvApi.getSuggestionCredits().then((response) => response.data),
+    staleTime: 60 * 1000,
+    retry: false,
+  });
+}
+
+/* One hook per section, all sharing the same shape so SuggestionPanel does not
+   need to know which section it is rendering.
+
+   Deliberately silent on success — the suggestions are the feedback, and a
+   toast on top of three cards appearing is noise. Errors still toast, except
+   for 429 and 503 which the panel renders inline because they are states the
+   user can act on rather than failures. */
+function useSuggestionMutation(mutationFn) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn,
+    onSuccess: (data) => {
+      if (data?.credits) {
+        queryClient.setQueryData(cvKeys.aiCredits, (previous) => ({
+          ...(previous ?? {}),
+          ...data.credits,
+          enabled: previous?.enabled ?? true,
+        }));
+      }
+    },
+    onError: (error) => {
+      const status = error?.response?.status;
+      if (status !== 429 && status !== 503) {
+        toast.error(extractApiError(error));
+      }
+      if (status === 429) {
+        queryClient.invalidateQueries({ queryKey: cvKeys.aiCredits });
+      }
+    },
+  });
+}
+
+export const useSuggestBullets = () =>
+  useSuggestionMutation((payload) => cvApi.suggestBullets(payload).then((r) => r.data));
+
+export const useSuggestSummary = () =>
+  useSuggestionMutation((payload) => cvApi.suggestSummary(payload ?? {}).then((r) => r.data));
+
+export const useSuggestSkills = () =>
+  useSuggestionMutation((payload) => cvApi.suggestSkills(payload ?? {}).then((r) => r.data));
+
+export const useSuggestProjectPoints = () =>
+  useSuggestionMutation((payload) => cvApi.suggestProjectPoints(payload).then((r) => r.data));
+
+export const useSuggestTitle = () =>
+  useSuggestionMutation((payload) => cvApi.suggestTitle(payload ?? {}).then((r) => r.data));
+
+/* Fire-and-forget: a failed accept-log must never block the user from using the
+   suggestion they just picked. */
+export function useAcceptSuggestion() {
+  return useMutation({
+    mutationFn: ({ logId, index }) => cvApi.acceptSuggestion(logId, index),
+    onError: () => {},
   });
 }
 
@@ -449,6 +525,232 @@ export function useDeletePhoto() {
       queryClient.invalidateQueries({ queryKey: cvKeys.profile });
       queryClient.invalidateQueries({ queryKey: ['cv', 'preview'] });
       toast.success('Photo removed.');
+    },
+    onError: onMutationError,
+  });
+}
+
+// --- CV upload & AI parse ----------------------------------------------------
+
+cvKeys.uploadStatus = (logId) => ['cv', 'upload', logId, 'status'];
+
+/* Terminal in the backend's sense: no further work happens without the user
+   acting, so polling stops here. */
+export const TERMINAL_UPLOAD_STATUSES = ['success', 'partial', 'failed', 'scanned'];
+
+/* Give up after this long even if the status never goes terminal. The backend's
+   stuck-upload sweeper should always beat this, but a client that polls forever
+   because a sweep did not run is a worse failure than one that says so. */
+const POLL_CEILING_MS = 3 * 60 * 1000;
+const POLL_INTERVAL_MS = 2000;
+
+export function useUploadCv() {
+  return useMutation({
+    mutationFn: ({ file, onProgress }) => cvApi.uploadCv(file, onProgress).then((r) => r.data),
+    onError: (error) => {
+      // 429 is the monthly cap and is rendered inline by the dropzone — it is a
+      // state the user can act on next month, not a failure of this upload.
+      if (error?.response?.status !== 429) {
+        toast.error(extractApiError(error));
+      }
+    },
+  });
+}
+
+/* Polls one upload until it reaches a terminal status.
+
+   `enabled` is what stops a mounted-but-idle builder polling forever; the
+   interval returns false once terminal so React Query stops on its own. */
+export function useUploadStatus(logId, { enabled = true } = {}) {
+  const startedAt = useRef(null);
+
+  useEffect(() => {
+    startedAt.current = logId ? Date.now() : null;
+  }, [logId]);
+
+  return useQuery({
+    queryKey: cvKeys.uploadStatus(logId),
+    queryFn: () => cvApi.getUploadStatus(logId).then((response) => response.data),
+    enabled: Boolean(logId) && enabled,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      if (data?.is_terminal) {
+        return false;
+      }
+      if (startedAt.current && Date.now() - startedAt.current > POLL_CEILING_MS) {
+        return false;
+      }
+      return POLL_INTERVAL_MS;
+    },
+    // The status is the point; a cached one is never useful.
+    staleTime: 0,
+    retry: false,
+  });
+}
+
+export function useRetryUploadParse() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (logId) => cvApi.retryUploadParse(logId).then((r) => r.data),
+    onSuccess: (data) => {
+      // Put the row back into a non-terminal state immediately so polling
+      // resumes without waiting for the next interval.
+      queryClient.setQueryData(cvKeys.uploadStatus(data.log_id), (previous) => ({
+        ...(previous ?? {}),
+        status: 'parsing',
+        is_terminal: false,
+        error_message: null,
+      }));
+    },
+    onError: onMutationError,
+  });
+}
+
+/* Applying is the only thing on this path that touches the CV, so it
+   invalidates everything — including the preview, which repaints itself with
+   the imported content. */
+export function useApplyImport() {
+  const invalidate = useCvInvalidator();
+
+  return useMutation({
+    mutationFn: ({ logId, choices, answers }) =>
+      cvApi.applyImport(logId, choices, answers).then((r) => r.data),
+    onSuccess: (data) => {
+      invalidate(
+        cvKeys.experiences,
+        cvKeys.education,
+        cvKeys.skills,
+        cvKeys.projects,
+        cvKeys.certifications,
+        cvKeys.languages,
+      );
+
+      const skipped = data?.skipped?.length ?? 0;
+      if (skipped) {
+        toast.warning(
+          `Imported ${data.imported} item${data.imported === 1 ? '' : 's'}. ` +
+            `${skipped} need${skipped === 1 ? 's' : ''} your attention.`,
+        );
+      } else {
+        toast.success(`Imported ${data.imported} item${data.imported === 1 ? '' : 's'} from your CV.`);
+      }
+    },
+    onError: onMutationError,
+  });
+}
+
+// --- Clearing the CV ---------------------------------------------------------
+
+/* Both wipe most of what the builder shows, so they invalidate everything
+   rather than trying to be surgical — including the preview, which must not
+   keep displaying a CV that no longer exists. */
+function useClearingMutation(mutationFn, onDone) {
+  const invalidate = useCvInvalidator();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn,
+    onSuccess: (data) => {
+      invalidate(
+        cvKeys.experiences,
+        cvKeys.education,
+        cvKeys.skills,
+        cvKeys.projects,
+        cvKeys.certifications,
+        cvKeys.languages,
+      );
+      queryClient.invalidateQueries({ queryKey: cvKeys.all, refetchType: 'all' });
+      onDone?.(data);
+    },
+    onError: onMutationError,
+  });
+}
+
+export function useResetCv() {
+  return useClearingMutation(
+    (sections) => cvApi.resetCv(sections).then((r) => r.data),
+    (data) => {
+      const total = data?.total_cleared ?? 0;
+      // Says what actually happened rather than "done", so the user can check
+      // it against what they expected to lose.
+      toast.success(
+        total > 0
+          ? `Cleared ${total} item${total === 1 ? '' : 's'}.`
+          : 'Nothing to clear — your CV was already empty.',
+      );
+    },
+  );
+}
+
+export function useDeleteCv() {
+  return useClearingMutation(
+    () => cvApi.deleteCv().then((r) => r.data),
+    () => toast.success('Your CV has been deleted.'),
+  );
+}
+
+// --- Module 1: job match -----------------------------------------------------
+
+cvKeys.cvSources = ['cv', 'job-match', 'sources'];
+cvKeys.jobMatches = ['cv', 'job-match'];
+cvKeys.jobMatch = (id) => ['cv', 'job-match', id];
+
+export function useCvSources() {
+  return useQuery({
+    queryKey: cvKeys.cvSources,
+    queryFn: () => cvApi.listCvSources().then((r) => r.data),
+    staleTime: 30 * 1000,
+    retry: false,
+  });
+}
+
+export function useJobMatches() {
+  return useQuery({
+    queryKey: cvKeys.jobMatches,
+    queryFn: () => cvApi.listJobMatches().then((r) => r.data),
+    retry: false,
+  });
+}
+
+export function useJobMatch(id) {
+  return useQuery({
+    queryKey: cvKeys.jobMatch(id),
+    queryFn: () => cvApi.getJobMatch(id).then((r) => r.data),
+    enabled: Boolean(id),
+    retry: false,
+  });
+}
+
+/* The most expensive call in the app, so the UI must never fire it twice for one
+   click and must show the remaining allowance honestly. 429 and 503 are rendered
+   inline rather than toasted — both are states the user can act on. */
+export function useRunJobMatch() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload) => cvApi.runJobMatch(payload).then((r) => r.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cvKeys.jobMatches });
+      queryClient.invalidateQueries({ queryKey: cvKeys.cvSources });
+    },
+    onError: (error) => {
+      const status = error?.response?.status;
+      if (status !== 429 && status !== 503 && status !== 400) {
+        toast.error(extractApiError(error));
+      }
+    },
+  });
+}
+
+export function useDeleteJobMatch() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) => cvApi.deleteJobMatch(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cvKeys.jobMatches });
+      toast.success('Removed.');
     },
     onError: onMutationError,
   });

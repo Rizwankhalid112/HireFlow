@@ -15,7 +15,23 @@ through an nginx reverse proxy. Two modules are actually built today:
 
 Everything else (`applications`, `notifications`, `analytics`, `reports`, `settings_app`) is **empty scaffolding** — every `.py` file in those apps is 0 bytes.
 
-The CV Builder is being built against a 10-step spec at `docs/cv_builder_spec.md`. **Steps 1–6 are done** (models, lifecycle, contact/summary, work experience, education/skills, projects/certs/languages). **Steps 7–10 are not started**: CV file upload, AI parsing via Claude, WeasyPrint PDF export, and the React CV Builder UI.
+The CV Builder is being built against a 10-step spec at `docs/cv_builder_spec.md`. **All ten steps are
+now built**, though two of them landed differently from the spec:
+
+- **Steps 1–6** — models, lifecycle, contact/summary, work experience, education/skills,
+  projects/certs/languages.
+- **Steps 7–8** — CV file upload, PDF/DOCX text extraction, and AI parse with a review-before-apply
+  diff flow. Built 2026-09-07 against [docs/cv_upload_parse_plan.md](../docs/cv_upload_parse_plan.md),
+  which supersedes the spec where they disagree. See §6.6.
+- **Step 9** — PDF export, built as an *exact-snapshot preview* (`/cv/preview/`) with the download
+  taken client-side from those same bytes. The spec's async `/cv/export/pdf|status|download/`
+  endpoints were not built and are not planned; the guarantee they existed to provide (what you
+  download is what you saw) is met more directly this way.
+- **Step 10** — the React CV Builder UI.
+
+Two features beyond the spec are also live: the **live preview** across all sections
+([docs/cv_live_preview_plan.md](../docs/cv_live_preview_plan.md)) and **AI writing suggestions**
+([docs/cv_ai_suggestions_rnd.md](../docs/cv_ai_suggestions_rnd.md)).
 
 ---
 
@@ -35,13 +51,14 @@ The CV Builder is being built against a 10-step spec at `docs/cv_builder_spec.md
 | django-celery-beat | 2.7.0 | DB-backed scheduler |
 | gunicorn | 23.0.0 | prod WSGI server |
 | whitenoise | 6.8.2 | static file serving |
+| anthropic | 1.3.0 | Claude client for AI writing suggestions |
 | weasyprint | 66.0 | CV template → PDF (needs Pango; see Dockerfile) |
 | Pillow | 11.1.0 | avatar `ImageField` |
 | requests | 2.32.3 | OAuth userinfo calls |
 
 Runtime: Python 3.12-slim, PostgreSQL 16-alpine, Redis 7-alpine, Nginx 1.27-alpine.
 
-**Deliberately absent** (needed for spec Steps 7–10): `pdfplumber`, `python-docx`, `weasyprint`, the Anthropic SDK, and `pytest`.
+All of `pdfplumber`, `python-docx`, `weasyprint`, the Anthropic SDK and `pytest` are now present — the earlier note listing them as deliberately absent is obsolete.
 
 ---
 
@@ -83,6 +100,22 @@ Note: `apps.applications` and `apps.notifications` exist on disk but are **not**
 
 **Configured 2026-08-18:** `CACHES` → Redis db 2 (db 0 is the Celery broker, db 1 the result
 backend). Required for the PDF render cache to work across gunicorn workers.
+
+**Throttling:** `ScopedRateThrottle` is the default class, with two rates — `ai_suggest`
+(`20/min`, added 2026-09-03) and `cv_upload` (`5/hour`, added 2026-09-07). Both cover endpoints that
+spend money per call; an upload does so one step removed, by queueing a task that calls Claude.
+Everything else remains unthrottled.
+
+**AI settings:** `ANTHROPIC_API_KEY` (blank by default — the feature degrades to 503 and nothing
+else changes), `AI_MODEL` (`claude-opus-5`), `AI_EFFORT` (`low`), `AI_TIMEOUT_SECONDS`,
+`AI_MONTHLY_CREDITS` (60).
+
+**Upload & parse settings (2026-09-07):** `AI_PARSE_MONTHLY_LIMIT` (5), `AI_PARSE_MAX_TOKENS`
+(8000 — the suggestion ceiling of 2000 truncates a full CV, and a truncated structured output
+arrives as `parsed_output=None` with nothing explaining why), `CV_UPLOAD_MAX_BYTES` (5 MB),
+`CV_EXTRACT_MAX_PAGES` (30), `CV_EXTRACT_MAX_CHARS` (60k), `CV_EXTRACT_MIN_CHARS` (100 — below this
+the file is treated as scanned and no API call is made), `CV_UPLOAD_STUCK_MINUTES` (5),
+`FILE_UPLOAD_MAX_MEMORY_SIZE` (2 MB, now set explicitly).
 
 **Not configured:** `LOGGING`, `CSRF_TRUSTED_ORIGINS`, `SECURE_HSTS_*`, `DATA_UPLOAD_MAX_MEMORY_SIZE`.
 
@@ -145,6 +178,7 @@ Every model: UUID PK, explicit `db_table`, an `order` IntegerField, and `created
 | `CVProject` | `cv_projects` | FK → CVProfile (`projects`). `tech_stack` JSON list (≤10, enforced in serializer), `is_ongoing`, `is_professional`. |
 | `CVCertification` | `cv_certifications` | FK → CVProfile (`certifications`). |
 | `CVLanguage` | `cv_languages` | FK → CVProfile (`languages`). `proficiency` (native/fluent/professional/basic). |
+| `AISuggestionLog` | `cv_ai_suggestion_logs` | FK → CVProfile (`ai_suggestions`). One row per suggestion request: section, target id, input digest, model, token counts, the returned suggestions, and `accepted_index`. Credits are **counted from these rows** rather than decremented from a counter — a drifting counter is unrecoverable, a count can always be recomputed. |
 | `CVUploadLog` | `cv_upload_logs` | FK → CVProfile (`upload_logs`). `parse_status`, `raw_extracted_text`, `ai_parsed_json`, field counters. **Model exists but nothing writes to it** — the upload endpoint and parse task are Steps 7–8. |
 
 There are **no** `unique_together`, indexes, or check constraints anywhere in the migration. The only DB-level uniqueness in the CV schema is `SkillCanonical.canonical_name` and the `CVProfile.user` OneToOne.
@@ -155,6 +189,10 @@ Pure functions, no ORM writes. Business logic lives here, never inline in views.
 
 - **`completion.py`** — `COMPLETE_THRESHOLD=75`, `SUMMARY_MIN_LENGTH=80`, `SKILLS_MIN_COUNT=5`. `calculate_section_completion()` returns booleans for `{contact, summary, experience, education, skills, projects}`; `compute_completion()` weights them **contact 25 / summary 10 / experience 25 / education 15 / skills 15 / projects 10**, caps at 100, returns `(score, score >= 75)`. `experience` requires ≥1 experience with ≥2 bullets. (The spec calls this file `completeness.py`; the real name is `completion.py`.)
 - **`metric_extractor.py`** — `extract_metric(text)`, first match over 7 regexes (`180+ tests`, `54% to 93%`, `reduced X by 40%`, `$20k`, `3x faster`, `50+ clients`, `10+ engineers`). Synchronous. Returns `None` rather than fabricating.
+- **`ai/`** — AI writing suggestions (see §16). `client.py` (one Claude call), `prompts.py`
+  (constants, one per section), `context.py` (per-section user payload), `guardrails.py`
+  (mechanical grounding checks), `schemas.py` (Pydantic structured-output models), `suggest.py`
+  (one entry point per section).
 - **`skill_detector.py`** — `extract_skills_from_bullet(text)`. Loads canonical names + aliases, sorts **longest-first** so "React Native" beats "React", caches for 3600 s, then does case-insensitive substring matching. Known false-positive risk ("Python" in "Monty Python"), acknowledged in the spec. Because no `CACHES` backend is configured, this cache is per-process and never invalidated when `SkillCanonical` changes.
 
 ### Shared helpers — [apps/cv_builder/utils.py](apps/cv_builder/utils.py)
@@ -178,6 +216,56 @@ Silent corrections rather than errors, per spec: `is_current` nulls `end_month`/
 All plain `APIView` subclasses — **no ViewSets, no routers** — with explicit `permission_classes = [IsAuthenticated]`. Detail views expose only **PUT and DELETE**; there is no per-item GET and no PATCH on any child resource.
 
 `views/project.py` defines a `_ReorderMixin` shared by the project/certification/language reorder views; the work-experience, bullet, education, and skill reorder views duplicate that logic inline instead.
+
+### 6.6 Upload & AI parse (spec Steps 7–8, built 2026-09-07)
+
+The one path in the module that ingests a user-supplied file. Design decisions and the full
+edge-case analysis live in [docs/cv_upload_parse_plan.md](../docs/cv_upload_parse_plan.md); what
+follows is the map.
+
+```
+POST /cv/upload/            validate → save → CVUploadLog(pending) → 202
+  └─ extract_text_from_cv   pdfplumber / python-docx → 'scanned' if <100 chars (no API call)
+      └─ send_to_ai_parser  structured-output Claude call → normalise → 'success' | 'partial'
+GET  /cv/upload/{id}/status/  polled every 2s; requires_review is DERIVED per request
+POST /cv/upload/{id}/retry/   re-runs stage 2 only; counts against the cap
+POST /cv/upload/{id}/apply/   the ONLY writer of parsed data
+```
+
+**Three invariants, each with a test that will fail loudly if broken:**
+
+1. **Nothing writes to the CV before apply.** Extraction, the AI call and normalisation are all
+   read-only with respect to the CV. `test_cv_parse.py::test_nothing_is_written_to_the_cv_on_any_parse_path`
+   guards it. This is the whole of the spec's overwrite protection — do not add a convenience save.
+2. **Enum values cannot drift.** `services/ai/schemas.py` uses `Literal` types holding exactly the
+   model choices, and structured outputs constrain generation to them, so the model *cannot* emit
+   `"Permanent"` into `employment_type`. `test_parse_mapping.py::TestTheSchemaConstrainsVocabulary`
+   asserts the literal sets equal the model choices; if you add a choice to a model, add it there.
+3. **Missing required fields are asked about, never guessed.** `WorkExperience.start_year` and
+   `Education.start_year` are NOT NULL and real CVs omit them (an education line usually prints only
+   a graduation year). `services/parse_normalize.py` flags the row `needs_attention`; the diff modal
+   collects one answer; apply refuses the row until it has one.
+
+**Files:**
+
+| File | Role |
+|---|---|
+| `serializers/upload.py` | File validation. Magic bytes (`%PDF-`, `PK\x03\x04`), not `content_type` — the client supplies that |
+| `services/extraction.py` | PDF and DOCX to text. DOCX reads **table cells** as well as paragraphs; two-column CVs put half their content in a table |
+| `services/ai/prompts.py::PARSE` | The mapping rules: headings by content not text, the Languages trap, unmapped sections, enum guidance |
+| `services/ai/parse.py` | One call, its own token ceiling (`AI_PARSE_MAX_TOKENS`) and its own failure message |
+| `services/parse_normalize.py` | Layer 2 — lengths, URL schemes, CGPA range, short bullets, date sanity, dedupe, the Languages guard |
+| `services/apply_parsed.py` | Layer 3 — per-row savepoints, writes through the section serializers |
+| `views/upload.py` | The four endpoints |
+
+**Metering.** A parse costs several times a suggestion, so it has its own controls:
+`cv_upload` throttle scope (5/hour) and `AI_PARSE_MONTHLY_LIMIT` (5), summed from
+`CVUploadLog.parse_attempts` — summed, not counted, because a retry is a real metered call.
+
+**The "Languages" trap.** A CV heading its programming languages "Languages" would otherwise store
+`Python (native speaker)` as a spoken language. The prompt covers it and `parse_normalize` enforces
+it: any `language_name` resolving to a canonical skill in the `Languages` category is moved to
+skills, and the user is told in `payload['notes']`.
 
 ### Signals — [apps/cv_builder/signals.py](apps/cv_builder/signals.py)
 
@@ -246,6 +334,8 @@ Auth is the global `IsAuthenticated` default (Bearer access token in the `Author
 | POST | `/api/cv/profile/` | Idempotent shell creation via `get_or_create`, prefilling `email`. **201 if created, 200 if it existed** |
 | GET | `/api/cv/profile/` | Full profile + `section_completion` (404 if none) |
 | PUT / PATCH | `/api/cv/profile/` | Full / partial update (PATCH is the autosave path) |
+| DELETE | `/api/cv/profile/` | Deletes the CV; everything CASCADEs. 204. Re-create with POST |
+| POST | `/api/cv/profile/reset/` | `{"sections": [...]}` clears those, omitted clears everything. Keeps the profile row, `template_id` and `email`. Returns `{cleared, total_cleared, profile}` |
 | GET | `/api/cv/profile/completion/` | `{completion_score, is_complete, section_completion}` for the progress bar |
 | GET / POST | `/api/cv/work-experience/` | List (prefetching bullets) / create |
 | PATCH | `/api/cv/work-experience/reorder/` | `{ordered_ids:[...]}`, atomic all-or-nothing |
@@ -263,12 +353,50 @@ Auth is the global `IsAuthenticated` default (Bearer access token in the `Author
 
 URL-ordering detail: `skills/search/`, `skills/bulk-add/`, and `skills/reorder/` are registered **before** `skills/` and `skills/<uuid:pk>/` so the literal segments aren't shadowed. Keep that ordering when adding routes.
 
+### Module 1 — job match (keywords + cover letter), built 2026-09-09
+
+| Method | Path | Notes |
+|---|---|---|
+| GET | `/api/cv/job-match/sources/` | Which CVs this user can match against — their built CV plus any upload that yielded text. Free; also returns the month's allowance |
+| POST | `/api/cv/job-match/` | `{jd_text, source_type: profile\|upload, upload_id?}`. **The most expensive call in the product.** Throttled `job_match` (10/hour), capped `AI_JOB_MATCH_MONTHLY_LIMIT` (20/month) |
+| GET | `/api/cv/job-match/` | History, without `cover_letter`/`jd_text` |
+| GET | `/api/cv/job-match/{id}/` | One result in full. Free — the letter written Monday is wanted Thursday |
+| DELETE | `/api/cv/job-match/{id}/` | **Soft delete.** The row survives so the month's count does; a hard delete would make "delete and re-run" an unlimited-usage bypass |
+
+**Three invariants:**
+
+1. **Nothing is written to the CV.** A match is an opinion plus a letter; acting on
+   either is the user's own manual edit. Same line the import holds.
+2. **The CV is sent whole, never truncated.** `context.build_full_cv_text()` exists
+   precisely because the other context builders cap roles and bullets — and here a
+   cut CV makes real skills look missing, so the feature would ask the user whether
+   they have a skill their own CV lists. Truncation invents gaps.
+3. **Keywords come back in three separate buckets** — `matched` / `reworded` /
+   `missing`. That is the Evidenced / Ask-first / Never model applied to job
+   keywords, and it is the whole reason this is not a tool for lying on a CV.
+   `reworded` ("Postgres" → "PostgreSQL") is where most of the real value is.
+
+**`match_score` is keyword alignment, not a prediction of being interviewed** —
+nothing here has the applicant pool or the callback history, and the field name and
+UI copy both say so. See [docs/job_match_rnd.md](../docs/job_match_rnd.md) §4.
+
+Named `JobMatch`, not `Application`, to leave that word free for the Kanban tracker.
+
+### Upload & AI parse — built 2026-09-07
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/api/cv/upload/` | multipart `file`. 202 `{log_id, status}`. Throttled `cv_upload`; monthly cap checked **before** the file is written |
+| GET | `/api/cv/upload/{log_id}/status/` | Polled every 2s. Adds `requires_review`, `parsed_data`, `existing_data` once terminal-successful. `requires_review` is derived per request, never stored |
+| POST | `/api/cv/upload/{log_id}/retry/` | Re-runs the AI stage on already-extracted text. 400 if there is none, 409 unless status is `failed`/`partial`. Counts against the cap |
+| POST | `/api/cv/upload/{log_id}/apply/` | `{choices: {section: keep\|replace\|merge}, answers: {section: {index: {field: value}}}}`. The only writer. 409 if already applied. Returns `{imported, skipped[], notes[]}` |
+
 ### Templates & PDF (built 2026-08-18)
 
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/api/cv/templates/` | Registry: id, name, description, columns, ats_safe, photo, max_pages |
-| GET | `/api/cv/preview/?template=<id>` | `application/pdf` inline — the rendered CV |
+| GET | `/api/cv/preview/?template=<id>` | `application/pdf` inline — the rendered CV. Sends `ETag` + `Cache-Control: private, must-revalidate` and `X-CV-Page-Count`; honours `If-None-Match` with a 304 |
 | GET | `/api/cv/preview/meta/?template=<id>` | `{page_count, max_pages, overflows}` |
 | POST / DELETE | `/api/cv/photo/` | Upload / clear the CV photo (multipart) |
 
@@ -276,6 +404,33 @@ URL-ordering detail: `skills/search/`, `skills/bulk-add/`, and `skills/reorder/`
 render path; both endpoints return its output from the same Redis cache entry, differing only in
 `Content-Disposition`. Never add a second renderer — a browser-side HTML preview would diverge
 from the PDF on line breaks and therefore page breaks.
+
+#### The render pipeline (rebuilt 2026-08-19 for the live preview)
+
+The preview now re-renders on every section save, so three things stand between the frontend and
+WeasyPrint. All three fail *silently* if broken — no error, just staleness or load — which is why
+they have tests (`tests/test_preview_cache.py`, `test_preview_etag.py`, `test_preview_singleflight.py`).
+
+`build_render_plan(cv, template_id)` resolves the template, builds the context and derives a digest
+**without rendering**. A view can therefore answer `If-None-Match` from the digest alone.
+
+1. **Content-addressed cache key.** The digest is `sha256(template_id + json(context))`, excluding
+   the static `template` dict. It used to hash `content_updated_at`, which is `auto_now` — so the
+   `template_id` PATCH the picker fires on every click invalidated the render for *every* template.
+   Narrowing that field is not an option: `send_draft_reminder` and `delete_stale_drafts` both read
+   it, so a user browsing templates would start getting deletion reminders.
+2. **Single-flight lock.** `cache.add(lock_key, ...)` is set-if-absent (atomic in Redis). Losers
+   poll for the winner's cache entry for ~2s, then render anyway rather than deadlock. With four
+   workers, three rapid saves must cost one render, not three.
+3. **ETag / 304.** The digest is the ETag. `Cache-Control` is `private` — this is one user's CV and
+   a shared proxy must never hold it.
+
+`resolve_template_id()` in the registry gives the id *after* the default fallback, so an unknown id
+and an explicit `minimal` share one cache entry.
+
+Gunicorn runs `--workers 4` (was 2) so preview renders do not contend with the form's own saves.
+That lives in `Dockerfile`, not compose — `Dockerfile.dev` uses `runserver`, which is threaded, so
+dev concurrency does not resemble prod.
 
 Six templates live in `templates/cv_templates/`, resolved through
 [templates_registry.py](apps/cv_builder/templates_registry.py) — **an allowlist, never string
@@ -302,8 +457,11 @@ ever truncated — the UI warns instead.
 |---|---|
 | `apps/accounts/migrations/0001_initial.py` | `User`, `UserProfile` |
 | `apps/cv_builder/migrations/0001_initial.py` | All ten CV tables (swappable dependency on `AUTH_USER_MODEL`) |
+| `apps/cv_builder/migrations/0002_cvprofile_photo_alter_cvprofile_template_id.py` | `CVProfile.photo`, template choices |
+| `apps/cv_builder/migrations/0004_aisuggestionlog.py` | `AISuggestionLog` |
+| `apps/cv_builder/migrations/0003_cvprofile_template_id_default.py` | Backfills NULL `template_id`, then makes it non-null with `default='minimal'` — the live preview always has a template to render, so "none chosen yet" is not a state anything handles |
 
-Ten tables, one migration per app, no follow-ups, and no `AddIndex`/`AddConstraint`/`unique_together` operations anywhere. The three other installed apps have no migrations directory (they have no models).
+Ten tables, and no `AddIndex`/`AddConstraint`/`unique_together` operations anywhere. The three other installed apps have no migrations directory (they have no models).
 
 ---
 
@@ -374,21 +532,60 @@ docker compose exec backend python manage.py createsuperuser
 
 Ordered by impact.
 
-1. **`normalize_profile_url` in [utils.py](apps/cv_builder/utils.py) is dead code for scheme-less input.** DRF runs `URLField`'s own validator inside `to_internal_value()` *before* calling `validate_<field_name>`, so `"linkedin.com/in/you"` is rejected with "Enter a valid URL" and the normalizer never sees it. Verified empirically. `project_url` and `credential_url` have no normalization at all. The frontend now prepends `https://` client-side (`features/cvBuilder/utils/payload.js::toAbsoluteUrl`); to fix it server-side, override `to_internal_value` or swap `URLField` for `CharField` plus an explicit validator.
+1. ~~**`normalize_profile_url` is dead code for scheme-less input.**~~ **Fixed 2026-09-08.** `SchemelessURLField` in [serializers/cv_profile.py](apps/cv_builder/serializers/cv_profile.py) normalizes inside `to_internal_value()`, before validation, so `"linkedin.com/in/you"` is accepted by the API rather than only by the frontend's own `toAbsoluteUrl`. This also closed a real inconsistency: the CV import already accepted scheme-less URLs, so the same value got two answers depending on the endpoint. `project_url` and `credential_url` still have no normalization — they take the same field if it becomes a problem.
 2. **`seed_skills` / `setup_cv_beat_tasks` are not automated** — a fresh deploy has no canonical skills and no beat schedule.
-3. **No `CACHES` config** — `skill_detector`'s cache is per-process LocMem and never invalidated when `SkillCanonical` changes.
-4. **`celery_worker` / `celery_beat` have no `media_volume` mount** — both file-touching tasks operate on an empty directory.
+3. ~~**`skill_detector`'s cache is never invalidated**~~ **Fixed 2026-09-08.** A `post_save`/`post_delete` receiver on `SkillCanonical` drops the index, so a freshly seeded skill is detectable immediately rather than up to an hour later.
+4. ~~**`celery_worker` / `celery_beat` have no `media_volume` mount**~~ **Fixed 2026-09-08, and it had become a launch blocker.** Low impact while only the cleanup tasks touched files; once Step 7 shipped, `extract_text_from_cv` runs in the worker and opens the uploaded CV from `MEDIA_ROOT`, so without the mount *every upload failed* with a misleading "this PDF could not be read".
 5. **No DB-level uniqueness on `CVSkill (cv, name)`** — concurrent adds can slip past the application-level `get_or_create`.
 6. **`LogoutView` requires a live access token**, so an expired session cannot clear or blacklist its refresh cookie.
-7. **Zero tests, no logging config, no OpenAPI schema.**
+7. **No logging config and no OpenAPI schema.** (Tests now exist for `cv_builder` — see §14.)
 8. Deprecated allauth 65 setting names at `settings.py:163-166`.
 9. Empty `config/asgi.py`; no `backend/apps/__init__.py` (works only via PEP 420 namespace packages).
 10. `apps.applications` / `apps.notifications` exist on disk but are not in `INSTALLED_APPS`.
 11. `NotFound` imported but unused in `views/cv_profile.py`; `permissions.py` entirely unused.
+12. **`extract_metric` does not read spelled-out numbers** ("a team of four engineers"). Deliberate — parsing English numerals is a separate job, and the AI asking for the figure is the right outcome. Pinned by a test so it stays a decision.
+13. **No frontend test harness.** The import modal, the polling hook and the reset UI have no automated coverage; `frontend/node_modules` is currently a root-owned empty directory, so even `npm ci` needs sudo to fix.
+
+### Fixed in the 2026-09-08 audit
+
+Two of these were silently corrupting data on every write and neither had a test:
+
+- **`skill_detector` matched substrings.** 27 canonical skills are 1–2 characters, so every bullet was tagged `R`, most also `C`, and "Managed relationships with 30 enterprise clients" returned `['PS','sh','TS','C','R']`. One mention of PostgreSQL returned four entries. Now identifier-aware boundary matching with alias→canonical de-duplication ([test_extractors.py](apps/cv_builder/tests/test_extractors.py)).
+- **`extract_metric` missed most real metrics** — no generic percentage pattern, so "Cut latency by 40%" returned `None`. Because `guardrails.wants_a_metric()` inverts it, the AI was asking users for a number their bullet already contained.
 
 ---
 
-## 14. Where to look next
+## 14. Tests (added 2026-08-19)
+
+This is the repo's first test suite. `pytest` + `pytest-django`, config in
+[backend/pytest.ini](pytest.ini), fixtures in [backend/conftest.py](conftest.py), tests in
+`apps/cv_builder/tests/`. The other apps still have empty `tests.py` files.
+
+```
+docker compose exec backend pytest apps/cv_builder/tests/          # 50 tests, ~30s
+docker compose exec backend pytest apps/cv_builder/tests/ -m "not slow"   # 38 tests, ~24s
+```
+
+Three things about this harness are load-bearing:
+
+- **`pytest_configure` repoints `CACHES` at Redis db 3** (0 broker, 1 results, 2 app cache). Django
+  swaps the *database* name for tests automatically but not Redis, so without this the suite writes
+  into the running app's cache and leaks state between tests — and the single-flight test would
+  pass for the wrong reason. An autouse fixture flushes the cache either side of every test.
+- **`test_preview_singleflight.py` needs `django_db(transaction=True)`.** The default test case
+  wraps each test in a transaction other threads cannot see, so a threaded test either deadlocks or
+  renders an empty CV. Each worker thread calls `connection.close()` or the post-test truncation
+  blocks.
+- **Renders cost ~250-360ms each.** The `sample_cv` fixture is deliberately minimal, and the
+  six-template sweeps are marked `slow` so they can be deselected. Keep it that way or people stop
+  running the suite.
+
+`testpaths = apps` matters too: a checked-out `backend/venv/` sits in the tree and its site-packages
+are full of third-party test modules that would otherwise be collected.
+
+---
+
+## 15. Where to look next
 
 - Spec and rationale for everything CV-related: [docs/cv_builder_spec.md](../docs/cv_builder_spec.md) (1263 lines; Steps 7–10 contain the upload/AI-parse/PDF-export designs, including the 5 MB cap, `get_valid_filename` path-traversal guard, scanned-PDF detection, the Claude prompt contract demanding `null` over fabrication, and the diff/overwrite-protection flow so an upload never silently clobbers existing data).
 - Frontend counterpart: [frontend/context.md](../frontend/context.md). The CV Builder UI (spec Step 10) is now built against this API — if you change a serializer field, choice value, or route here, update `frontend/src/features/cvBuilder/` in the same change. The frontend mirrors the choice values in `features/cvBuilder/constants.js` and the validation rules in `features/cvBuilder/schemas/cvSchemas.js`; both are the first places to break when the backend contract moves.

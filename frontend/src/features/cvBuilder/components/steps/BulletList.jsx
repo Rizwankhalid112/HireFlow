@@ -6,9 +6,11 @@ import {
   useCreateBullet,
   useDeleteBullet,
   useReorderBullets,
+  useSuggestBullets,
   useUpdateBullet,
 } from '../../api/cvQueries';
 import { useReorder } from '../../hooks/useReorder';
+import { SuggestionPanel } from '../ai/SuggestionPanel';
 
 const MIN_LENGTH = 10;
 
@@ -61,6 +63,7 @@ export function BulletList({ experienceId, bullets = [] }) {
   const updateMutation = useUpdateBullet();
   const deleteMutation = useDeleteBullet();
   const reorderMutation = useReorderBullets();
+  const suggestMutation = useSuggestBullets();
 
   const { moveUp, moveDown, isReordering } = useReorder(bullets, reorderMutation, (orderedIds) => ({
     experienceId,
@@ -203,6 +206,22 @@ export function BulletList({ experienceId, bullets = [] }) {
           + Add bullet
         </Button>
       )}
+
+      {/* `needsNote` is always on here: a bullet generated from a job title
+          alone has no facts to work from but the ones it invents. */}
+      <SuggestionPanel
+        mutation={suggestMutation}
+        label="Suggest bullets"
+        emptyLabel="Draft from a note"
+        needsNote
+        notePlaceholder="What did you actually do? e.g. 'added redis caching to the api'"
+        buildPayload={({ note }) => ({ experience_id: experienceId, note })}
+        onApply={(text) => createMutation.mutate({ experienceId, payload: { text } })}
+        onApplyAndEdit={(text) => {
+          setDraft(text);
+          setAdding(true);
+        }}
+      />
 
       <ConfirmDialog
         open={Boolean(pendingDelete)}

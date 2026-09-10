@@ -77,6 +77,16 @@ def resolve_template(template_id):
     return get_template(template_id) or CV_TEMPLATES[DEFAULT_TEMPLATE_ID]
 
 
+def resolve_template_id(template_id):
+    """The id actually rendered, after the fallback.
+
+    The preview cache key is derived from this rather than the requested value,
+    so an unknown id and an explicit 'minimal' share one cache entry instead of
+    rendering the same document twice.
+    """
+    return template_id if get_template(template_id) else DEFAULT_TEMPLATE_ID
+
+
 def template_choices():
     """`choices` for the model field, so admin and validation agree."""
     return [(key, value['name']) for key, value in CV_TEMPLATES.items()]

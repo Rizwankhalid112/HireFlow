@@ -1,5 +1,10 @@
 /* Option values must match the TextChoices in backend/apps/cv_builder/models/. */
 
+/* Mirrors DEFAULT_TEMPLATE_ID in backend/apps/cv_builder/templates_registry.py.
+   The backend now defaults the column, so this is only the gap before the
+   profile query resolves. */
+export const DEFAULT_TEMPLATE_ID = 'minimal';
+
 export const EMPLOYMENT_TYPES = [
   { value: 'full_time', label: 'Full-time' },
   { value: 'part_time', label: 'Part-time' },
@@ -83,6 +88,13 @@ export const MAX_TECH_STACK = 10;
    otherwise look like the score has stalled for no reason. */
 export const STEPS = [
   {
+    key: 'template',
+    label: 'CV Templates',
+    sections: [],
+    points: 0,
+    requirement: 'Browse 6 layouts and pick one',
+  },
+  {
     key: 'contact',
     label: 'Contact & Summary',
     sections: ['contact', 'summary'],
@@ -123,13 +135,6 @@ export const STEPS = [
     sections: [],
     points: 0,
     requirement: 'Optional — does not affect your score',
-  },
-  {
-    key: 'template',
-    label: 'Template & Preview',
-    sections: [],
-    points: 0,
-    requirement: 'Pick a layout and see your CV',
   },
 ];
 

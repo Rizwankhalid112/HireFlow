@@ -7,9 +7,11 @@ from apps.cv_builder.models import (
     CVProject,
     CVSkill,
     Education,
+    SkillCanonical,
     WorkBullet,
     WorkExperience,
 )
+from apps.cv_builder.services.skill_detector import invalidate_skill_index
 
 
 def _touch_cv_profile(cv):
@@ -59,3 +61,15 @@ def certification_changed(sender, instance, **kwargs):
 @receiver(post_delete, sender=CVLanguage)
 def language_changed(sender, instance, **kwargs):
     _touch_cv_profile(instance.cv)
+
+
+@receiver(post_save, sender=SkillCanonical)
+@receiver(post_delete, sender=SkillCanonical)
+def canonical_skill_changed(sender, instance, **kwargs):
+    """Drop the detector's index when the canonical table changes.
+
+    It is cached for an hour, so without this a freshly seeded skill stays
+    undetectable for up to an hour after `seed_skills` runs — which, on a first
+    deploy, is exactly when someone is trying it out.
+    """
+    invalidate_skill_index()

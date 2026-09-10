@@ -22,6 +22,14 @@ class Command(BaseCommand):
                 'task': 'apps.cv_builder.tasks.delete_orphaned_files',
                 'crontab': {'hour': '3', 'minute': '0', 'day_of_week': '0'},
             },
+            {
+                # Every 5 minutes, not daily: this is what stops the frontend
+                # polling a row whose worker died, so the delay before it fires
+                # is time the user spends watching a spinner.
+                'name': 'cv_builder_fail_stuck_uploads',
+                'task': 'apps.cv_builder.tasks.fail_stuck_uploads',
+                'crontab': {'hour': '*', 'minute': '*/5'},
+            },
         ]
 
         for entry in tasks:

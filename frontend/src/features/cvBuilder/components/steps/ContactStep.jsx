@@ -5,11 +5,18 @@ import { toast } from 'sonner';
 
 import { Alert, Button, FormField, TextareaField } from '@/components/ui';
 
-import { usePatchProfile, useUpdateProfile } from '../../api/cvQueries';
+import {
+  usePatchProfile,
+  useSuggestSummary,
+  useSuggestTitle,
+  useUpdateProfile,
+} from '../../api/cvQueries';
 import { SUMMARY_MIN_LENGTH } from '../../constants';
 import { clearBackup, readBackup, useAutosave } from '../../hooks/useAutosave';
 import { profileSchema } from '../../schemas/cvSchemas';
 import { toAbsoluteUrl } from '../../utils/payload';
+import { SuggestionPanel } from '../ai/SuggestionPanel';
+import { ImportPanel } from '../import/ImportPanel';
 import { SectionShell } from '../SectionShell';
 import { SaveStatus } from '../SaveStatus';
 
@@ -48,6 +55,8 @@ function toPayload(values) {
 export function ContactStep({ profile }) {
   const patchMutation = usePatchProfile();
   const updateMutation = useUpdateProfile();
+  const suggestSummaryMutation = useSuggestSummary();
+  const suggestTitleMutation = useSuggestTitle();
 
   const defaultValues = useMemo(() => toFormValues(profile), [profile]);
 
@@ -56,6 +65,7 @@ export function ContactStep({ profile }) {
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors, isDirty },
   } = useForm({
     resolver: zodResolver(profileSchema),
@@ -128,6 +138,16 @@ export function ContactStep({ profile }) {
       autosaves={false}
       action={<SaveStatus status={autosave.status} lastSavedAt={autosave.lastSavedAt} />}
     >
+      {/* The import lives at the top of the first step because that is where a
+          new user arrives, and typing six sections by hand when you already have
+          a CV is the thing this feature exists to prevent. It reloads the form
+          from the server on success rather than merging locally — apply writes
+          through the same serializers the form does, so the server's copy is
+          the truth. */}
+      <div className="mb-6">
+        <ImportPanel onImported={() => reset(toFormValues(profile))} />
+      </div>
+
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
         {recovered ? (
           <Alert variant="info">
@@ -219,6 +239,18 @@ export function ContactStep({ profile }) {
           />
         </div>
 
+        {/* Small section, disproportionate effect: applicant tracking systems
+            match this line against the job title in a posting. */}
+        <SuggestionPanel
+          mutation={suggestTitleMutation}
+          label="Suggest a professional title"
+          buildPayload={() => ({})}
+          onApply={(text) => {
+            setValue('professional_title', text, { shouldDirty: true });
+            markDirty();
+          }}
+        />
+
         <TextareaField
           id="summary"
           label="Professional summary"
@@ -227,6 +259,18 @@ export function ContactStep({ profile }) {
           error={errors.summary}
           registration={register('summary')}
           hint={`${summary.trim().length} characters — ${SUMMARY_MIN_LENGTH}+ earns the summary points.`}
+        />
+
+        {/* The summary is the one section where generating from scratch is
+            legitimate — the raw material is elsewhere on the CV, not invented. */}
+        <SuggestionPanel
+          mutation={suggestSummaryMutation}
+          label="Suggest a summary"
+          buildPayload={() => ({})}
+          onApply={(text) => {
+            setValue('summary', text, { shouldDirty: true });
+            markDirty();
+          }}
         />
 
         {summaryTooShort ? (

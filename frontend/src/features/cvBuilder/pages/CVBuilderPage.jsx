@@ -1,10 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { Alert, Button, Card, Spinner } from '@/components/ui';
 
-import { useCompletion, useCvProfile, useEnsureProfile } from '../api/cvQueries';
+import { useCompletion, useCvProfile, useEnsureProfile, useTemplates } from '../api/cvQueries';
 import { CompletionBar } from '../components/CompletionBar';
+import { DangerZone } from '../components/DangerZone';
 import { StepNavigator } from '../components/StepNavigator';
+import { PreviewPane } from '../components/preview/PreviewPane';
+import { PreviewSheet } from '../components/preview/PreviewSheet';
 import { ContactStep } from '../components/steps/ContactStep';
 import { EducationStep } from '../components/steps/EducationStep';
 import { ExperienceStep } from '../components/steps/ExperienceStep';
@@ -12,10 +17,29 @@ import { ExtrasStep } from '../components/steps/ExtrasStep';
 import { ProjectsStep } from '../components/steps/ProjectsStep';
 import { SkillsStep } from '../components/steps/SkillsStep';
 import { TemplateStep } from '../components/steps/TemplateStep';
+import { usePreview } from '../hooks/usePreview';
+import { useTemplateSelection } from '../hooks/useTemplateSelection';
 import { STEPS } from '../constants';
 
+const STEP_KEYS = STEPS.map((step) => step.key);
+
+/* Tailwind's `xl`. Read in JS as well as CSS because the pane must not merely
+   be hidden below this width — it must not mount, or a phone pays for a server
+   render it never displays. */
+const PREVIEW_PANE_QUERY = '(min-width: 1280px)';
+
 export default function CVBuilderPage() {
-  const [activeStep, setActiveStep] = useState('contact');
+  /* The step lives in the URL so the Dashboard can deep-link straight to the
+     template gallery, and so back/forward and refresh behave sensibly. */
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requested = searchParams.get('step');
+  const activeStep = STEP_KEYS.includes(requested) ? requested : 'contact';
+
+  const setActiveStep = useCallback(
+    (key) => setSearchParams(key === 'contact' ? {} : { step: key }, { replace: true }),
+    [setSearchParams],
+  );
+
   const [ready, setReady] = useState(false);
 
   const ensureProfile = useEnsureProfile();
@@ -33,8 +57,54 @@ export default function CVBuilderPage() {
       .catch(() => setReady(false));
   }, [ensureProfile]);
 
+  /* Deleting removes the profile row, so every query below would 404 against a
+     CV that no longer exists. Re-create the shell immediately and send the user
+     back to the first step — the alternative is an error screen after a button
+     they deliberately pressed. */
+  const onCleared = (kind) => {
+    if (kind !== 'deleted') {
+      return;
+    }
+    setReady(false);
+    ensureProfile
+      .mutateAsync()
+      .then(() => {
+        setReady(true);
+        setActiveStep(STEPS[0].key);
+      })
+      .catch(() => setReady(false));
+  };
+
   const { data: profile, isLoading, isError } = useCvProfile({ enabled: ready });
   const { data: completion } = useCompletion({ enabled: ready });
+  const { data: templates = [] } = useTemplates();
+
+  const { selectedId, select, isSaving } = useTemplateSelection(profile);
+  const selectedTemplate = templates.find((template) => template.id === selectedId);
+
+  const hasPane = useMediaQuery(PREVIEW_PANE_QUERY);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  /* Held here rather than inside the pane because the mobile trigger shows it
+     too, and it is only known once pdf.js has parsed the rendered document. */
+  const [pageCount, setPageCount] = useState(0);
+  const onPageCount = useCallback((count) => setPageCount(count), []);
+
+  /* One preview query for both surfaces, so the pane and the mobile sheet share
+     a single request and a single auto-refresh preference. */
+  const preview = usePreview({
+    profile,
+    templateId: selectedId,
+    enabled: ready && (hasPane || sheetOpen),
+  });
+
+  // Crossing the breakpoint with the sheet open would leave it stacked on top
+  // of the pane showing the same document.
+  useEffect(() => {
+    if (hasPane && sheetOpen) {
+      setSheetOpen(false);
+    }
+  }, [hasPane, sheetOpen]);
 
   // completion_score is recomputed on every write, so prefer the dedicated
   // endpoint and fall back to the copy embedded in the profile.
@@ -74,7 +144,14 @@ export default function CVBuilderPage() {
       case 'extras':
         return <ExtrasStep />;
       case 'template':
-        return <TemplateStep profile={profile} />;
+        return (
+          <TemplateStep
+            profile={profile}
+            selectedId={selectedId}
+            onSelect={select}
+            isSaving={isSaving}
+          />
+        );
       default:
         return null;
     }
@@ -108,7 +185,7 @@ export default function CVBuilderPage() {
         </Alert>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[240px_minmax(0,1fr)_380px] 2xl:grid-cols-[260px_minmax(0,1fr)_460px]">
         <Card className="h-fit lg:sticky lg:top-6">
           {/* Repeated here because the header card scrolls out of view while
               you work, and the score is the main feedback that a save landed. */}
@@ -122,7 +199,7 @@ export default function CVBuilderPage() {
           />
         </Card>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           {isLoading ? <Spinner className="py-20" /> : renderStep()}
 
           <div className="flex items-center justify-between gap-3">
@@ -140,8 +217,46 @@ export default function CVBuilderPage() {
               {nextStep ? nextStep.label : 'Done'} →
             </Button>
           </div>
+
+          <DangerZone onCleared={onCleared} />
         </div>
+
+        {/* Mounted only above xl — see PREVIEW_PANE_QUERY. */}
+        {hasPane ? (
+          <Card className="sticky top-6 flex max-h-[calc(100vh-3rem)] flex-col">
+            <PreviewPane
+              preview={preview}
+              template={selectedTemplate}
+              profile={profile}
+              pageCount={pageCount}
+              onPageCount={onPageCount}
+            />
+          </Card>
+        ) : null}
       </div>
+
+      {/* Sticky rather than a floating circle, so it never covers a form field.
+          Negative margins cancel AppLayout's own padding on <main>. */}
+      {!hasPane ? (
+        <div className="sticky bottom-0 z-30 -mx-4 -mb-4 border-t border-slate-200 bg-white/90 px-4 py-3 backdrop-blur md:-mx-6 md:-mb-6 md:px-6 dark:border-slate-800 dark:bg-slate-900/90">
+          <Button className="w-full" onClick={() => setSheetOpen(true)}>
+            Preview CV
+            {pageCount > 0 ? ` · ${pageCount} ${pageCount === 1 ? 'page' : 'pages'}` : ''}
+          </Button>
+        </div>
+      ) : null}
+
+      {sheetOpen ? (
+        <PreviewSheet
+          open={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          preview={preview}
+          template={selectedTemplate}
+          profile={profile}
+          pageCount={pageCount}
+          onPageCount={onPageCount}
+        />
+      ) : null}
     </div>
   );
 }

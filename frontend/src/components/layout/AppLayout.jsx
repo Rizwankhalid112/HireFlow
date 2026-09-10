@@ -7,6 +7,7 @@ import { useLogout, useProfile } from '@/features/auth/api/authQueries';
 const navItems = [
   { label: 'Dashboard', to: '/home' },
   { label: 'CV Builder', to: '/cv-builder' },
+  { label: 'Job Match', to: '/job-match' },
 ];
 
 export function AppLayout() {

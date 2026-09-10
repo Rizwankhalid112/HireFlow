@@ -8,12 +8,14 @@ import {
   useReorderSkills,
   useSkills,
   useSkillSearch,
+  useSuggestSkills,
   useUpdateSkill,
 } from '../../api/cvQueries';
 import { PROFICIENCY_LEVELS, SKILL_CATEGORIES, SKILLS_MIN_COUNT } from '../../constants';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { useReorder } from '../../hooks/useReorder';
 import { toNullableDecimal } from '../../utils/payload';
+import { SuggestionPanel } from '../ai/SuggestionPanel';
 import { EmptyState, SectionShell } from '../SectionShell';
 
 /*
@@ -224,6 +226,7 @@ export function SkillsStep() {
 
   const { data: skills = [], isLoading } = useSkills();
   const createMutation = useCreateSkill();
+  const suggestMutation = useSuggestSkills();
   const updateMutation = useUpdateSkill();
   const deleteMutation = useDeleteSkill();
   const reorderMutation = useReorderSkills();
@@ -292,6 +295,79 @@ export function SkillsStep() {
             />
           </FieldShell>
         </div>
+
+        {/* Two lists, and the distinction is the whole point: `evidenced` skills
+            are demonstrated in text the user wrote and add in one click;
+            role-suggested ones are not on the CV at all and are labelled as
+            claims they will be asked to back up. */}
+        <SuggestionPanel
+          mutation={suggestMutation}
+          label="Find skills in my CV"
+          buildPayload={() => ({})}
+          hasResult={(result) =>
+            result.evidenced?.length > 0 || result.suggested_for_role?.length > 0
+          }
+          renderResult={(result) => (
+            <div className="mt-3 space-y-4">
+              {result.evidenced?.length ? (
+                <div>
+                  <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                    Found in your own experience and projects
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {result.evidenced.map((skill) => (
+                      <button
+                        key={skill.name}
+                        type="button"
+                        title={skill.evidence}
+                        onClick={() =>
+                          createMutation.mutate({
+                            name: skill.name,
+                            category: skill.category || '',
+                            ...(skill.canonical_id ? { canonical_id: skill.canonical_id } : {}),
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800 transition-colors hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-200 dark:hover:bg-emerald-900"
+                      >
+                        + {skill.name}
+                        {skill.is_verified ? <span aria-hidden="true">✓</span> : null}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {result.suggested_for_role?.length ? (
+                <div>
+                  <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
+                    Common for your target role — not on your CV yet
+                  </p>
+                  <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                    Only add these if you can talk about them in an interview.
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {result.suggested_for_role.map((skill) => (
+                      <button
+                        key={skill.name}
+                        type="button"
+                        onClick={() =>
+                          createMutation.mutate({
+                            name: skill.name,
+                            category: skill.category || '',
+                            ...(skill.canonical_id ? { canonical_id: skill.canonical_id } : {}),
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 transition-colors hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200 dark:hover:bg-amber-900"
+                      >
+                        + {skill.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          )}
+        />
 
         {skills.length === 0 ? (
           <EmptyState

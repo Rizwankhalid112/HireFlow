@@ -18,10 +18,11 @@ skeletal authenticated home.
 Plus the **CV Builder** (`src/features/cvBuilder/`) — spec Step 10, built against the live Steps 1–6 API. Six
 sections with full CRUD, reorder, canonical skill autocomplete, completion scoring and profile autosave. See §16.
 
+Plus **CV import** (`src/features/cvBuilder/components/import/`, built 2026-09-07): upload a PDF or DOCX,
+watch it get read, review what was found, choose per section what to keep. See §17.
+
 **What doesn't exist yet:** Kanban board, application tracking, analytics, notifications, settings, and reports
-are all empty `.gitkeep` directories or 0-byte files. Within the CV Builder, upload/AI-parse (spec Steps 7–8) and
-PDF export (Step 9) are absent because **those backend endpoints do not exist** — nothing is stubbed against a
-route that would 404.
+are all empty `.gitkeep` directories or 0-byte files.
 
 ---
 
@@ -91,7 +92,7 @@ frontend/
     │   └── KanbanBoard|Charts|Notifications|ApplicationDrawer|UI/   EMPTY
     ├── pages/                 top-level pages (mix of real and 0-byte stubs)
     ├── context/               ThemeContext.jsx
-    ├── hooks/                 useAppSelector.js
+    ├── hooks/                 useAppSelector.js, useMediaQuery.js
     ├── utils/                 extractApiError.js
     ├── api/                   EMPTY — superseded by features/*/api
     └── styles/index.css       the app's only stylesheet
@@ -258,9 +259,14 @@ All className-merged by template literal (no `clsx`/`cva`/`tailwind-merge` depen
 | `Alert` | `variant`: info \| success \| warning \| error |
 | `Spinner` | fixed 8×8 indigo ring in a centering wrapper |
 | `FormField` | composes `<label>` + `<Input>` + error `<p>`; props `id, label, type, error, registration, placeholder, autoComplete` |
-| `index.js` | barrel: `Alert, Button, Card, FormField, Input, Spinner` |
+| `Badge` | `variant`: neutral \| brand \| success \| warning |
+| `Checkbox` | `forwardRef`, composes `<label>` + `<input type=checkbox>` |
+| `Select` / `SelectField` / `Textarea` / `TextareaField` / `FieldShell` | the form primitives the CV Builder needed |
+| `Modal` | `size`: sm \| md \| lg \| **full**. Handles Escape and body-scroll lock. `full` is the mobile preview sheet — edge to edge, `h-[100dvh]`, `p-0`, and the body is left to the caller so it owns its own scroll region |
+| `ConfirmDialog` | destructive-action confirmation built on `Modal` |
+| `index.js` | barrel: `Alert, Badge, Button, Card, Checkbox, ConfirmDialog, FieldShell, FormField, Input, Modal, Select, SelectField, Spinner, Textarea, TextareaField` |
 
-Two gaps to know: `FormField` has a **closed prop list** (no `...rest`), so `disabled`, `min`, `inputMode` etc. silently do nothing — extend it when you add non-text fields. And there is no `Select`, `Textarea`, `Checkbox`, `Modal`, `Badge`, `Table`, or `Tooltip` yet; the CV Builder UI will need most of those.
+One gap to know: `FormField` has a **closed prop list** (no `...rest`), so `disabled`, `min`, `inputMode` etc. silently do nothing — extend it when you add non-text fields. There is still no `Table` or `Tooltip`.
 
 ### Layouts — [src/components/layout/](src/components/layout/)
 
@@ -384,11 +390,18 @@ features/cvBuilder/
 ├── constants.js            choice options, months, weights, step list, date formatting
 ├── schemas/cvSchemas.js    Zod mirrors of the backend serializer validation
 ├── utils/payload.js        '' -> null coercion, tech_stack parsing, URL scheme fix
-├── hooks/                  useAutosave, useDebouncedValue, useReorder
-├── components/             CompletionBar, StepNavigator, SectionShell, EntryCard, SaveStatus
+├── utils/downloadPdf.js    saves the previewed bytes, so the file is what was on screen
+├── hooks/                  useAutosave, useDebouncedValue, useReorder,
+│                           usePreview, useTemplateSelection
+├── components/             CompletionBar, StepNavigator, SectionShell, EntryCard, SaveStatus,
+│                           TemplateGallery
+├── components/ai/          SuggestionPanel — the shared surface for every AI suggestion
+├── components/preview/     PdfCanvas, PreviewPane, PreviewSheet
 ├── components/steps/       ContactStep, ExperienceStep (+ExperienceForm, BulletList),
-│                           EducationStep, SkillsStep, ProjectsStep, ExtrasStep
-└── pages/CVBuilderPage.jsx shell: ensure-profile, completion bar, step nav, prev/next
+│                           EducationStep, SkillsStep, ProjectsStep, ExtrasStep,
+│                           TemplateStep, PhotoUploader
+└── pages/CVBuilderPage.jsx shell: ensure-profile, completion bar, step nav, prev/next,
+                            preview pane + mobile sheet
 ```
 
 **Load sequence.** `GET /cv/profile/` 404s until a CV shell exists, so the page POSTs first (idempotent per spec §2.1, guarded by a ref against StrictMode's double effect) and only enables the profile and completion queries once that resolves.
@@ -409,6 +422,79 @@ features/cvBuilder/
 
 **Two contract traps encoded here.** Django's `URLField` validator runs before the backend's `normalize_profile_url`, so `toAbsoluteUrl` prepends `https://` client-side for all five URL fields. And `Education.cgpa` is `DecimalField(max_digits=3)`, so the schema caps CGPA below 10 even though the form accepts any scale.
 
+### AI writing suggestions (built 2026-09-03)
+
+Per-section suggestions on bullets, summary, skills, project points and the
+professional title. Design and market research: [docs/cv_ai_suggestions_rnd.md](../docs/cv_ai_suggestions_rnd.md).
+
+Everything routes through one component, `components/ai/SuggestionPanel.jsx`, which enforces the
+two rules that would be undone by getting them wrong in any single call site:
+
+- **Nothing is ever applied automatically.** `onApply` only fires from a click. Suggestions render
+  as cards with *Use this* and *Use & edit*; the user's text is never replaced behind their back.
+- **An empty field asks for a note first** (`needsNote`). Generating from a job title alone leaves
+  the model no material but its own invention, which is the failure the whole feature is built
+  around. Bullets always ask; projects ask only when the description is empty.
+
+Other behaviour worth keeping:
+
+- **Gap questions render as amber chips.** When the backend withholds a figure it did not have, the
+  question comes back instead. Clicking one seeds the note box. This is the feature, not an error
+  state — see the R&D doc.
+- **429 and 503 render inline, not as toasts.** Both are states the user can act on (allowance
+  exhausted, service down), and a toast that disappears is the wrong affordance. `useSuggestionMutation`
+  deliberately suppresses the toast for those two statuses only.
+- **Regeneration is capped at three.** Unlimited rerolls burn credits and produce worse averages.
+- **`active`** exists for lists that share one mutation across many rows (the project cards): every
+  row keeps a working trigger, but only the row that asked renders the response.
+- **Credits come back on every response** and are written straight into the `['cv','ai','credits']`
+  cache, so the badge never needs a separate refetch.
+- **Skills render two lists,** and the distinction is the point: green *evidenced* chips add in one
+  click; amber *suggested for your role* chips are labelled as claims the user will be asked to back
+  up. `renderResult` + `hasResult` exist for exactly this shape.
+
+If `ANTHROPIC_API_KEY` is unset the credits endpoint reports `enabled: false` and `SuggestionPanel`
+renders nothing at all — the builder is unchanged for anyone running without a key.
+
+### The live preview (built 2026-08-19)
+
+The preview is a **server render displayed through pdf.js**, not a client-side reproduction of the
+CV in HTML. That is the whole architecture: the standing requirement is that what you see is
+byte-identical to what you download, and WeasyPrint and a browser disagree on font metrics and line
+breaking — one different line break shifts everything after it and can change the page count. Never
+add an HTML "fast path"; it reintroduces exactly the drift this design exists to prevent.
+
+The cost is that every refresh is a real ~300ms server render, so the whole design is about making
+that cheap and never visibly slow.
+
+- **`usePreview`** owns all of it: a 600ms debounce on `content_updated_at`, the auto/manual mode
+  (persisted to `localStorage`), `placeholderData: (prev) => prev` so the previous PDF stays on
+  screen while the next renders, and `refresh()`. Trigger is the content stamp, not keystrokes —
+  saves here are already explicit per section, so the debounce collapses *bursts of saves*.
+- **Never blank on refresh.** `PdfCanvas` draws into a `DocumentFragment` and swaps it in when
+  complete, and `PreviewPane` keeps the last good document on screen even when a render errors.
+  Blanking to a spinner every time a section saves reads as breakage.
+- **`PdfCanvas` measures its own scale** from the container via `ResizeObserver` (`width / 595`,
+  A4 being 595pt at scale 1). The old hardcoded `scale={1.35}` produced a ~1070px canvas that
+  overflowed the pane. `onPageCount` is held in a ref so an inline arrow from the caller does not
+  redraw the document every commit.
+- **The visibility gate is behavioural, not CSS.** `useMediaQuery('(min-width: 1280px)')` in
+  `CVBuilderPage` decides whether the pane *mounts*. Tailwind's `hidden xl:block` would still mount
+  it and a phone would pay for a render it never displays. Verified: a phone-width load fires zero
+  `/cv/preview/` requests until the sheet is opened.
+- **Below xl** the preview is a sticky bottom-bar trigger plus a full-screen `Modal size="full"`
+  sheet, with fit-width by default and a tap toggle to 100%.
+- **Empty CVs skip the render entirely** (`isCvEmpty`) and show a placeholder — a near-blank PDF
+  looks like a bug and costs a full render to produce.
+- **Template selection lives in `useTemplateSelection`,** above both the gallery and the pane,
+  because the pane must render the template just clicked while the user is on another step. It is
+  optimistic, reverting on a failed PATCH.
+- **`getPreviewPdf` takes React Query's `signal`.** A superseded render must be aborted, not left
+  occupying a worker the form's own saves are queued behind.
+
+One subtlety worth keeping: the query is gated on `Boolean(activeStamp)`. Without it the first
+render fires under a blank stamp and again under the real one — two requests per page load.
+
 ### Adding a section
 
 1. Add wrappers to `cvApi.js`, then hooks to `cvQueries.js` via `useSectionMutation`.
@@ -422,3 +508,73 @@ features/cvBuilder/
 
 - Backend counterpart, including the full API surface this app talks to: [backend/context.md](../backend/context.md).
 - Upload + AI parse (spec Steps 7–8) and PDF export (Step 9) are the next builds, but **each needs its backend endpoints first** — `POST /cv/upload/`, the status/apply routes, and the export routes do not exist yet. Designs are in [docs/cv_builder_spec.md](../docs/cv_builder_spec.md); the upload status poller and diff modal are specced in §10.4–10.5.
+
+---
+
+## 17. CV import (spec Steps 7–8, built 2026-09-07)
+
+Three components under `src/features/cvBuilder/components/import/`, mounted at the top of
+`ContactStep` because that is where a new user arrives and typing six sections by hand is what this
+feature exists to prevent.
+
+| File | Role |
+|---|---|
+| `UploadDropzone.jsx` | Drag/drop + file picker, upload progress, the per-stage label while polling. Its size/type checks duplicate the server's **on purpose** — the server is the gate, this is just a fast answer |
+| `ImportReviewModal.jsx` | The diff. Per-section keep/replace/merge, the `needs_attention` questions, and the unmapped-sections block |
+| `ImportPanel.jsx` | Owns the state machine: upload → poll → review → apply. Deliberately one component, because four failure points tracked from two places is how a stuck spinner ships |
+
+**Hooks** in `api/cvQueries.js`: `useUploadCv`, `useUploadStatus` (2s poll, stops on
+`is_terminal` and at a 3-minute ceiling), `useRetryUploadParse`, `useApplyImport`.
+
+**Two things worth not breaking:**
+
+- **`useApplyImport` invalidates every CV query**, which is what makes the live preview repaint with
+  the imported CV. Drop a key and that section silently stays stale.
+- **An empty CV skips the review modal** but still goes through apply — apply is the only writer,
+  and the shortcut is through the review, not around it.
+
+The `needs_attention` inputs are not optional polish. `WorkExperience.start_year` and
+`Education.start_year` are NOT NULL and real CVs routinely omit them; the backend refuses to invent
+one, so without these inputs those rows simply never import.
+
+---
+
+## 18. Clearing a CV (added 2026-09-08)
+
+`components/DangerZone.jsx`, mounted at the bottom of every step in
+`CVBuilderPage`, collapsed by default. Three actions, deliberately distinct:
+clear one section (the common case after a bad import), start over (empties
+everything, keeps the CV, the template and the account email), and delete.
+
+Hooks: `useResetCv`, `useDeleteCv` in `api/cvQueries.js`. Both invalidate the
+whole `cv` key space, including the preview — it must not keep showing a CV that
+no longer exists.
+
+**The bit that will break if moved:** deleting removes the profile row, so every
+query 404s afterwards. `CVBuilderPage.onCleared` re-runs `ensureProfile` and
+returns to the first step. Without that the user gets an error screen
+immediately after pressing a button they meant to press.
+
+---
+
+## 19. Job Match (Module 1, added 2026-09-09)
+
+New feature slice at `src/features/jobMatch/`, routed at `/job-match` and in the
+app sidebar. Paste a job description, pick which CV to use, get keyword analysis
+and a cover letter.
+
+- `pages/JobMatchPage.jsx` — one screen, not a wizard: two inputs do not need two
+  steps. The result renders below the form so re-running against an edited posting
+  is one click.
+- `components/MatchResult.jsx` — renders the three keyword buckets as three
+  visually distinct blocks. **Do not flatten them into one tagged list**: reworded
+  is a free win, missing is a question the user must answer honestly, and merging
+  them is what would turn this into a tool that encourages lying on a CV.
+
+Hooks live in `cvBuilder/api/cvQueries.js` (the API module is shared):
+`useCvSources`, `useJobMatches`, `useJobMatch`, `useRunJobMatch`, `useDeleteJobMatch`.
+
+**The call behind this is the most expensive in the product**, so the remaining
+monthly allowance is always visible and the button is disabled while it runs — a
+double submit costs real money twice. 400/429/503 render inline rather than as
+toasts, because all three are states the user can act on.

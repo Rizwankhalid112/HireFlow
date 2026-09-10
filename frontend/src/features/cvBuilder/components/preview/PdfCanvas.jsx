@@ -8,26 +8,68 @@ import { Spinner } from '@/components/ui';
    Vite rather than a CDN or a hand-written path. */
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
+/* A4 is 595pt wide at scale 1, so container width / 595 is fit-to-width. */
+const A4_WIDTH_PT = 595;
+
+/* Past this the canvas costs more memory than the extra sharpness is worth —
+   and a 1600px-wide pane does not need a 3x render. */
+const MAX_SCALE = 2;
+
 /*
  * Renders the real PDF to <canvas>. This is why the preview is a true snapshot:
  * we are not re-laying-out the CV in the browser, we are drawing the same
  * document the download returns.
+ *
+ * `scale` is measured from the container by default. A fixed value overflowed
+ * the side pane; a phone and a 1600px desktop pane need different numbers, and
+ * only the DOM knows which one we are in.
  */
-export function PdfCanvas({ data, scale = 1.35 }) {
-  const containerRef = useRef(null);
+export function PdfCanvas({ data, scale, onPageCount }) {
+  const measureRef = useRef(null);
+  const pagesRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [error, setError] = useState(null);
-  const [rendering, setRendering] = useState(true);
+
+  /* Held in a ref so an inline arrow from the caller does not land in the
+     render effect's deps and redraw the whole document every commit. */
+  const onPageCountRef = useRef(onPageCount);
+  onPageCountRef.current = onPageCount;
 
   useEffect(() => {
-    if (!data) return undefined;
+    const element = measureRef.current;
+    if (!element || typeof ResizeObserver === 'undefined') {
+      return undefined;
+    }
+
+    /* Measured on a wrapper the canvases do not size, so a wider canvas can
+       never widen the box being measured and start a feedback loop. Floored so
+       sub-pixel jitter does not re-render the document. */
+    const observer = new ResizeObserver(([entry]) => {
+      setContainerWidth(Math.floor(entry.contentRect.width));
+    });
+
+    observer.observe(element);
+    setContainerWidth(Math.floor(element.clientWidth));
+    return () => observer.disconnect();
+  }, []);
+
+  const fitScale = containerWidth > 0
+    ? Math.min(containerWidth / A4_WIDTH_PT, MAX_SCALE)
+    : 0;
+  const effectiveScale = scale ?? fitScale;
+
+  useEffect(() => {
+    // Width of 0 means we have not measured yet; rendering now would produce a
+    // zero-size canvas that has to be thrown away.
+    if (!data || effectiveScale <= 0) {
+      return undefined;
+    }
 
     let cancelled = false;
     let pdf = null;
-    const container = containerRef.current;
 
     async function render() {
-      setRendering(true);
       setError(null);
 
       try {
@@ -37,16 +79,18 @@ export function PdfCanvas({ data, scale = 1.35 }) {
         pdf = await task.promise;
         if (cancelled) return;
 
-        setPageCount(pdf.numPages);
-        container.replaceChildren();
-
         const dpr = window.devicePixelRatio || 1;
+
+        /* Drawn into a fragment and swapped in at the end. Clearing the live
+           container first would blank the preview on every save, which is
+           exactly the flicker stale-while-revalidate exists to avoid. */
+        const fragment = document.createDocumentFragment();
 
         for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
           const page = await pdf.getPage(pageNumber);
           if (cancelled) return;
 
-          const viewport = page.getViewport({ scale });
+          const viewport = page.getViewport({ scale: effectiveScale });
           const canvas = document.createElement('canvas');
           const context = canvas.getContext('2d');
 
@@ -57,22 +101,27 @@ export function PdfCanvas({ data, scale = 1.35 }) {
           canvas.style.width = `${viewport.width}px`;
           canvas.style.height = `${viewport.height}px`;
           canvas.className =
-            'mx-auto mb-4 max-w-full rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700';
+            'mx-auto mb-4 rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700';
           canvas.setAttribute('aria-label', `CV page ${pageNumber}`);
 
-          container.appendChild(canvas);
+          fragment.appendChild(canvas);
           await page.render({
             canvasContext: context,
             viewport,
             transform: dpr === 1 ? null : [dpr, 0, 0, dpr, 0, 0],
           }).promise;
+          if (cancelled) return;
         }
+
+        pagesRef.current?.replaceChildren(fragment);
+        setPageCount(pdf.numPages);
+        onPageCountRef.current?.(pdf.numPages);
       } catch (renderError) {
-        if (!cancelled) {
+        // An aborted render is the expected outcome of a superseded refresh,
+        // not something to show the user.
+        if (!cancelled && renderError?.name !== 'RenderingCancelledException') {
           setError(renderError?.message || 'Could not display the PDF.');
         }
-      } finally {
-        if (!cancelled) setRendering(false);
       }
     }
 
@@ -82,18 +131,19 @@ export function PdfCanvas({ data, scale = 1.35 }) {
       cancelled = true;
       pdf?.destroy?.();
     };
-  }, [data, scale]);
+  }, [data, effectiveScale]);
 
   return (
-    <div>
-      {rendering ? <Spinner className="py-10" /> : null}
-      {error ? <p className="py-6 text-center text-sm text-red-600">{error}</p> : null}
-      <div ref={containerRef} className={rendering ? 'hidden' : ''} />
-      {!rendering && !error && pageCount > 0 ? (
-        <p className="text-center text-xs text-slate-500 dark:text-slate-400">
-          {pageCount} {pageCount === 1 ? 'page' : 'pages'}
-        </p>
+    <div ref={measureRef} className="w-full">
+      {/* Only ever shown before the first page exists — a refresh keeps the
+          previous render on screen instead. */}
+      {pageCount === 0 && !error ? <Spinner className="py-10" /> : null}
+
+      {error ? (
+        <p className="py-6 text-center text-sm text-red-600 dark:text-red-400">{error}</p>
       ) : null}
+
+      <div ref={pagesRef} />
     </div>
   );
 }

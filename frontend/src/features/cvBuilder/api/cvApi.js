@@ -14,6 +14,15 @@ export const updateProfile = (payload) => api.put('/cv/profile/', payload);
 export const patchProfile = (payload) => api.patch('/cv/profile/', payload);
 export const getCompletion = () => api.get('/cv/profile/completion/');
 
+/* Clearing the CV. `resetCv()` empties content but keeps the profile, the
+   template choice and the account email; `deleteCv()` removes it entirely and
+   the user starts again with ensureProfile(). Pass `sections` to clear only
+   part of it — the usual case after an import brought in the wrong roles. */
+export const resetCv = (sections) =>
+  api.post('/cv/profile/reset/', sections ? { sections } : {});
+
+export const deleteCv = () => api.delete('/cv/profile/');
+
 // --- Work experience ---------------------------------------------------------
 export const listExperiences = () => api.get('/cv/work-experience/');
 export const createExperience = (payload) => api.post('/cv/work-experience/', payload);
@@ -80,11 +89,16 @@ export const reorderLanguages = (orderedIds) =>
 // --- Templates, preview, photo -----------------------------------------------
 export const listTemplates = () => api.get('/cv/templates/');
 
-/* arraybuffer, not blob: PdfCanvas hands the bytes straight to pdf.js. */
-export const getPreviewPdf = (templateId) =>
+/* arraybuffer, not blob: PdfCanvas hands the bytes straight to pdf.js.
+
+   `signal` is React Query's AbortSignal. The preview refetches on every save,
+   so a superseded request must be cancelled rather than left to occupy a
+   worker producing a render nobody will see. */
+export const getPreviewPdf = (templateId, signal) =>
   api.get('/cv/preview/', {
     params: templateId ? { template: templateId } : undefined,
     responseType: 'arraybuffer',
+    signal,
   });
 
 export const getPreviewMeta = (templateId) =>
@@ -100,3 +114,67 @@ export const uploadPhoto = (file) => {
 };
 
 export const deletePhoto = () => api.delete('/cv/photo/');
+
+// --- CV upload & AI parse ----------------------------------------------------
+/* The upload returns immediately with a log id; everything after it is polled.
+   Nothing on this path writes to the CV until applyImport is called. */
+export const uploadCv = (file, onProgress) => {
+  const form = new FormData();
+  form.append('file', file);
+  return api.post('/cv/upload/', form, {
+    // Let the browser set the multipart boundary.
+    headers: { 'Content-Type': undefined },
+    onUploadProgress: onProgress
+      ? (event) => onProgress(event.total ? Math.round((event.loaded * 100) / event.total) : 0)
+      : undefined,
+  });
+};
+
+export const getUploadStatus = (logId) => api.get(`/cv/upload/${logId}/status/`);
+
+/* Re-runs the AI stage on text we already extracted, so a transient upstream
+   failure does not cost the user another upload. */
+export const retryUploadParse = (logId) => api.post(`/cv/upload/${logId}/retry/`);
+
+/* `choices` is one of keep | replace | merge per section. `answers` supplies
+   the required fields the CV did not state, keyed by section then row index. */
+export const applyImport = (logId, choices, answers) =>
+  api.post(`/cv/upload/${logId}/apply/`, { choices, answers });
+
+// --- AI writing suggestions --------------------------------------------------
+/* The only metered endpoints in the app. Every response carries the remaining
+   credit allowance so the UI never has to guess. */
+export const getSuggestionCredits = () => api.get('/cv/suggest/credits/');
+
+export const suggestBullets = (payload) => api.post('/cv/suggest/bullets/', payload);
+export const suggestSummary = (payload) => api.post('/cv/suggest/summary/', payload);
+export const suggestSkills = (payload) => api.post('/cv/suggest/skills/', payload);
+export const suggestProjectPoints = (payload) => api.post('/cv/suggest/projects/', payload);
+export const suggestTitle = (payload) => api.post('/cv/suggest/title/', payload);
+
+/* Records which variant was taken. Accept rate per section is the only honest
+   measure of whether this feature works, and it cannot be reconstructed later. */
+export const acceptSuggestion = (logId, index) =>
+  api.post(`/cv/suggest/${logId}/accept/`, { index });
+
+/* Public URL for a template's sample thumbnail. Rendered from fixed demo data
+   with no auth, so it can be used directly as an <img src> — a Bearer token
+   cannot be attached to an image request. */
+export const templateSampleUrl = (templateId) => {
+  const base = import.meta.env.VITE_API_URL || 'http://localhost/api';
+  return `${base.replace(/\/$/, '')}/cv/templates/${templateId}/sample/`;
+};
+
+// --- Module 1: job match -----------------------------------------------------
+/* One call returns keyword analysis and a cover letter together — they come from
+   the same reading of the CV and the posting, so splitting them would mean
+   sending both documents twice. */
+export const listCvSources = () => api.get('/cv/job-match/sources/');
+
+export const runJobMatch = (payload) => api.post('/cv/job-match/', payload);
+
+export const listJobMatches = () => api.get('/cv/job-match/');
+
+export const getJobMatch = (id) => api.get(`/cv/job-match/${id}/`);
+
+export const deleteJobMatch = (id) => api.delete(`/cv/job-match/${id}/`);
