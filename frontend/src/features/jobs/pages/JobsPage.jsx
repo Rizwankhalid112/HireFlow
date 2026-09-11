@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Alert, Button, Card, ConfirmDialog, Input, Select, Spinner } from '@/components/ui';
 
 import { useDeleteJob, useJobStats, useJobs } from '../api/jobsQueries';
+import * as jobsApi from '../api/jobsApi';
 import { JobCard } from '../components/JobCard';
 import { JobDetailModal } from '../components/JobDetailModal';
 import { useDebouncedValue } from '@/features/cvBuilder/hooks/useDebouncedValue';
@@ -39,6 +41,9 @@ export default function JobsPage() {
   const [page, setPage] = useState(1);
   const [openJobId, setOpenJobId] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
+  const [useCv, setUseCv] = useState(false);
+  const [tailoring, setTailoring] = useState(null);
+  const navigate = useNavigate();
 
   // Debounced so typing does not fire a query per keystroke against a large table.
   const debouncedSearch = useDebouncedValue(search, 400);
@@ -46,15 +51,35 @@ export default function JobsPage() {
 
   const params = {
     page,
+    ...(useCv ? { match: 'cv' } : {}),
     ...(debouncedSearch ? { search: debouncedSearch } : {}),
     ...(debouncedLocation ? { location: debouncedLocation } : {}),
     ...(source ? { source } : {}),
     ...(remoteType ? { remote_type: remoteType } : {}),
   };
 
-  const { data, isLoading, isFetching, isError } = useJobs(params);
+  const { data, error, isLoading, isFetching, isError } = useJobs(params);
   const { data: stats } = useJobStats();
   const remove = useDeleteJob();
+
+  /* The description is not in the list payload — it would be several thousand
+     characters per row — so it is fetched for the one job being tailored, then
+     handed to the match page through router state. */
+  const tailor = async (job) => {
+    setTailoring(job.id);
+    try {
+      const { data: full } = await jobsApi.getJob(job.id);
+      navigate('/job-match', {
+        state: {
+          jdText: full.description,
+          jobTitle: full.title,
+          company: full.company_name,
+        },
+      });
+    } finally {
+      setTailoring(null);
+    }
+  };
 
   const jobs = data?.results ?? [];
   const total = data?.count ?? 0;
@@ -110,6 +135,27 @@ export default function JobsPage() {
             options={REMOTE}
           />
         </div>
+        <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-slate-200 pt-3 dark:border-slate-800">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+            <input
+              type="checkbox"
+              checked={useCv}
+              onChange={(e) => onFilterChange(setUseCv)(e.target.checked)}
+              className="h-4 w-4 rounded border-slate-300 dark:border-slate-600"
+            />
+            Find jobs using my CV
+          </label>
+          {useCv && data?.matched_against?.length ? (
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Matching on {data.matched_against.slice(0, 8).join(', ')}
+            </span>
+          ) : (
+            <span className="text-xs text-slate-500 dark:text-slate-400">
+              Ranks by the skills on your CV instead of by date.
+            </span>
+          )}
+        </div>
+
         {remoteType ? (
           // Honesty about a real gap: Greenhouse does not publish this field, so
           // for those listings it is inferred from wording and some are simply
@@ -121,7 +167,12 @@ export default function JobsPage() {
         ) : null}
       </Card>
 
-      {isError ? <Alert variant="error">Jobs could not be loaded.</Alert> : null}
+      {isError ? (
+        <Alert variant={useCv ? 'warning' : 'error'}>
+          {/* Usually "add some skills first", which the user can act on. */}
+          {error?.response?.data?.detail || 'Jobs could not be loaded.'}
+        </Alert>
+      ) : null}
 
       {isLoading ? (
         <Spinner className="py-16" />
@@ -150,6 +201,7 @@ export default function JobsPage() {
                 job={job}
                 onOpen={(j) => setOpenJobId(j.id)}
                 onDelete={setPendingDelete}
+                onTailor={tailor}
               />
             ))}
           </ul>

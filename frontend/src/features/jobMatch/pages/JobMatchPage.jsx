@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { Alert, Button, Card, Select, Spinner, Textarea } from '@/components/ui';
 
@@ -24,7 +25,12 @@ import { MatchResult } from '../components/MatchResult';
 const MIN_JD_CHARS = 120;
 
 export default function JobMatchPage() {
-  const [jdText, setJdText] = useState('');
+  /* A job handed over from the jobs list, so the user does not copy and paste a
+     description they were already looking at. Read once as the initial value
+     rather than synced, so their edits are never overwritten by a re-render. */
+  const handedOver = useLocation().state ?? null;
+
+  const [jdText, setJdText] = useState(handedOver?.jdText ?? '');
   const [sourceKey, setSourceKey] = useState('profile');
   const [result, setResult] = useState(null);
 
@@ -69,6 +75,14 @@ export default function JobMatchPage() {
           covers, which are just worded differently, and write you a cover letter.
         </p>
       </div>
+
+      {handedOver?.jobTitle ? (
+        <Alert variant="info">
+          Using <strong>{handedOver.jobTitle}</strong>
+          {handedOver.company ? ` at ${handedOver.company}` : ''} from your jobs list.
+          Edit the description below if you want to.
+        </Alert>
+      ) : null}
 
       <Card>
         <div className="space-y-4">

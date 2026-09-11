@@ -317,6 +317,13 @@ keep multi-KB descriptions out of list queries, mandatory pagination, and
 retention to bound growth. Measured: forced through the GIN index a search runs
 0.19ms vs 10.98ms sequential.
 
+**CV ranking (`?match=cv`):** orders jobs by skill overlap with the caller's CV,
+as one OR'd tsquery so it uses the same GIN index as ordinary search. Returns
+`matched_against` (the skills used) and per-job `matched_skills`. Deliberately
+**not** an AI call: deterministic, free per search, and it can show the user
+which of their skills matched rather than an unexplained score. A CV with fewer
+than two skills gets an actionable 400 rather than a meaningless ordering.
+
 **Operational:** `manage.py seed_companies` then `manage.py fetch_jobs`.
 Companies are fetched concurrently (Lever is 5-20s per call while the others are
 ~1s) and one failing company never stops the run; five consecutive failures

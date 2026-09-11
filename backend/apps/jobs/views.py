@@ -15,11 +15,26 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.cv_builder.models import CVProfile
 from apps.jobs.models import Job, TrackedCompany
+from apps.jobs.services.cv_ranking import (
+    NotEnoughSkills,
+    matched_skills_for,
+    rank_by_cv,
+)
 from apps.jobs.serializers import (
     JobDetailSerializer,
     JobListSerializer,
     TrackedCompanySerializer,
+)
+
+
+# Columns the card renders. Everything else — the description above all — is
+# left out of list queries.
+_LIST_FIELDS = (
+    'id', 'title', 'company_name', 'location_raw', 'remote_type',
+    'employment_type', 'department', 'salary_text', 'source',
+    'apply_url', 'posted_at', 'last_seen_at',
 )
 
 
@@ -67,17 +82,43 @@ class JobListView(APIView):
         if company:
             queryset = queryset.filter(company_name__iexact=company)
 
-        # `only()` keeps the multi-thousand-character description out of a list
-        # query that never renders it.
-        queryset = queryset.only(
-            'id', 'title', 'company_name', 'location_raw', 'remote_type',
-            'employment_type', 'department', 'salary_text', 'source',
-            'apply_url', 'posted_at', 'last_seen_at',
-        )
+        # Rank against the user's CV instead of by date. Deterministic skill
+        # overlap, not an AI call — see services/cv_ranking.py.
+        cv_terms = None
+        if request.query_params.get('match') == 'cv':
+            profile = CVProfile.objects.filter(user=request.user).first()
+            if profile is None:
+                return Response(
+                    {'detail': 'Create your CV first — we match jobs against its skills.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                queryset, cv_terms = rank_by_cv(queryset, profile)
+            except NotEnoughSkills as exc:
+                return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # When ranking by CV we need the description to report which skills
+        # matched, so it is loaded for the page only — never for the whole set.
+        if cv_terms:
+            queryset = queryset.only(*_LIST_FIELDS, 'description')
+        else:
+            queryset = queryset.only(*_LIST_FIELDS)
 
         paginator = JobPagination()
         page = paginator.paginate_queryset(queryset, request)
-        return paginator.get_paginated_response(JobListSerializer(page, many=True).data)
+        data = JobListSerializer(page, many=True).data
+
+        if cv_terms:
+            # Computed over the 25 rows being returned, so it costs nothing.
+            for item, job in zip(data, page):
+                item['matched_skills'] = matched_skills_for(
+                    f'{job.title} {job.description}', cv_terms,
+                )
+
+        response = paginator.get_paginated_response(data)
+        if cv_terms:
+            response.data['matched_against'] = cv_terms
+        return response
 
 
 class JobDetailView(APIView):

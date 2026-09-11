@@ -49,7 +49,7 @@ function freshnessTone(job) {
   return 'text-slate-500 dark:text-slate-400';
 }
 
-export function JobCard({ job, onOpen, onDelete }) {
+export function JobCard({ job, onOpen, onDelete, onTailor }) {
   return (
     <li className="rounded-xl border border-slate-200 bg-white p-4 transition-colors hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -91,9 +91,24 @@ export function JobCard({ job, onOpen, onDelete }) {
         ) : null}
       </div>
 
+      {/* Which of the user's own skills this job mentions. Shown as the actual
+          skill names rather than a score, because "matched Python, Django" is
+          something they can check and a percentage is not. */}
+      {job.matched_skills?.length ? (
+        <p className="mt-2 text-xs text-emerald-700 dark:text-emerald-300">
+          Matches your {job.matched_skills.slice(0, 6).join(', ')}
+          {job.matched_skills.length > 6 ? ` and ${job.matched_skills.length - 6} more` : ''}
+        </p>
+      ) : null}
+
       <div className="mt-3 flex flex-wrap gap-2">
         <Button size="sm" variant="secondary" onClick={() => onOpen(job)}>
           View
+        </Button>
+        {/* The join between the two modules: hands this description straight to
+            the match page instead of making the user copy and paste it. */}
+        <Button size="sm" variant="secondary" onClick={() => onTailor(job)}>
+          Tailor CV for this
         </Button>
         <a href={job.apply_url} target="_blank" rel="noopener noreferrer">
           <Button size="sm">Apply on {job.source_label}</Button>
