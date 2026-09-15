@@ -357,6 +357,22 @@ to a review queue.
 - **The inbound address is a bearer secret.** High-entropy local part, and require
   `X-Forwarded-For` plus a passing DKIM signature before auto-updating anything.
 
+### ❌ Correction: forwarding does *not* reduce the privacy surface
+
+§1 of this document said forwarding "gets most of the value with a fraction of the
+privacy surface". **That is half right, and the wrong half is load-bearing.**
+
+Forwarding shrinks the **Google platform** surface to zero — that part holds, and it is a
+real saving (below). It does **nothing** for GDPR, and arguably *enlarges* that exposure:
+with no processor relationship, we are an unambiguous controller for third-party data we
+never had any relationship with.
+
+Two facts specific to our design make this sharper than the generic case. Filtering by
+ATS/employer domain means **100% of ingested mail is third-party by construction** —
+recruiter personal data is the entire payload, not an edge case. And `ApplicationContact`
+already stores recruiter name, email and LinkedIn; the moment anything emails that
+contact, **Art. 14(3)(b)** collapses the notice deadline to first contact.
+
 ### Privacy — this needs real work, not a checkbox
 
 We would be a **controller**, not a processor. Recruiter names in forwarded mail are
@@ -377,7 +393,83 @@ personal data of people who never consented, so:
   account deletion** and batches deletions monthly, which one reviewer called "borderline
   negligent".
 
-A DPIA is likely required and is cheap insurance; it also forces the retention decision.
+**A DPIA is not "likely required" — it is triggered by design.** The ICO's Art. 35(4)
+list names our exact situation: *"Invisible processing: processing of personal data that
+has not been obtained direct from the data subject in circumstances where the controller
+considers that compliance with Article 14 would prove impossible or involve
+disproportionate effort."* The Irish DPC list says the same at item 8. **The moment we
+rely on Art. 14(5)(b), we trip the DPIA list** — the two obligations are deliberately
+coupled.
+
+### The legal detail that changes the build, not just the policy
+
+| Finding | Consequence for the code |
+|---|---|
+| **Controller, not processor — not arguable.** EDPB 07/2020 ¶40: "essential means" include which data, for how long, which categories of recipients and data subjects. A tracker decides all four. And if the user sits inside the household exemption there is **no controller for us to be a processor for** | Every obligation lands on us directly |
+| **Art. 6(1)(b) contract is textually unavailable** for recruiter data — EDPB 2/2019 ¶22 requires necessity for a contract *with the data subject*, and the recruiter is not a party | 6(1)(f) only, with a written balancing test |
+| **Art. 14(5)(b) is narrow.** WP260 ¶55: it "cannot be routinely relied upon" outside archiving/research/statistics, and the impossibility must be "directly connected to" indirect collection | A recruiter-facing notice at a stable URL is mandatory, not optional |
+| **Art. 21(1) objection is the request we will actually get — not Art. 15** | Build a **suppression list keyed on recruiter email** from day one. One email must suppress that recruiter across *every* user's data |
+| **Art. 20 portability does not apply to recruiters** — requires a consent/contract basis and data they provided | One obligation we genuinely do not have |
+| **Art. 9 has no contract exception.** Explicit consent is the only route and we cannot obtain it from a recruiter | Never extract or index health/accommodation/EEO content; keep bodies out of any training |
+| **CCPA's B2B exemption expired 1 Jan 2023** (§ 1798.145(n)(3)) | Recruiter business-context data now gets full CCPA protection. Any pre-2023 analysis is obsolete |
+| **The CCPA revenue threshold is $26,625,000**, CPI-adjusted — not $25M. And threshold (B) reads "buys, sells, or **shares**", not "collects" | A pre-revenue tracker that never sells or shares may be **outside CCPA entirely** — a real position, but a threshold one that evaporates on an ad pixel |
+| **11 CCR § 7012(h)**: a business that does not collect directly from the consumer needs no notice at collection **if it neither sells nor shares** | California imposes **no proactive notice duty to recruiters** at all. The hardest GDPR obligation has no CCPA counterpart |
+| **A recruiter deletion request must search across every user's data** | Most trackers key everything to `user_id`. Index stored mail by **sender address** now, or this is a migration later, not a query |
+
+### ECPA is comfortable; CIPA is the residual risk
+
+**There is probably no "intercept" at all.** *Konop* (9th Cir. 2002) and *Fraser*
+(3d Cir. 2003) require acquisition **contemporaneous with transmission**; a forward is a
+*new* transmission our user originates, and we are its intended recipient. Belt and
+braces, § 2511(2)(d) needs only **one** party's consent, and our user is a party. In
+*In re Yahoo Mail*, the subscriber's consent **defeated the non-subscribers' federal
+Wiretap claim outright** — the exact recruiter analogue.
+
+**California's CIPA § 631 is harder**, because it requires **all-party** consent and
+reaches email (*Matera v. Google*). Our "nothing is acquired in transit" defence is strong
+on the merits but, per *In re Yahoo Mail*, **is not a motion-to-dismiss defence** — a
+plaintiff can plead around it.
+
+**The argument never to make:** that recruiters impliedly consented "because that is how
+email works". Judge Koh rejected precisely that. It is the most common engineering
+intuition here and it has been tested and lost.
+
+### Two operational traps in Gmail forwarding
+
+- **Gmail's default forwards everything.** *"By default, automatic forwarding sends all
+  your Gmail messages to the new address."* A misconfiguring user sends us their entire
+  mailbox. We must detect that — volume spike, senders matching nothing — and purge rather
+  than silently retain.
+- **Workspace admins disable external forwarding** as a routine DLP control, and it is
+  off by default for new M365 tenants. Corporate and university accounts frequently cannot
+  complete onboarding at all.
+
+### What Google's policy actually costs us: nothing, and that part was right
+
+Limited Use and the annual **CASA** assessment are both gated on *requesting OAuth
+scopes* — *"Your use of data obtained via the product's specified scopes…"*. Reading Gmail
+bodies via the API is a **restricted scope**, triggering verification plus CASA. Receiving
+forwarded mail by SMTP requests no scope, holds no token, and calls no API, so none of it
+attaches.
+
+**But avoiding Google's policy is not avoiding the law.** Limited Use and CASA are
+*contractual* duties owed to Google; GDPR, CCPA and CIPA are *legal* duties owed to the
+public. Forwarding trades a reviewable, standardised compliance regime for an unreviewed
+one — which means **nobody will tell us when we drift out of bounds**.
+
+### The models worth copying
+
+**Simplify** is the architecture to copy: *"We store only message metadata and short
+previews (such as sender, subject, snippet, and category) to run your tracker — we do not
+store the full content of your emails or attachments"*, plus *"we never use the content of
+your connected email account… to train generalized AI"*, and it is the only product that
+**grants rights to non-users**. **Superhuman** has the best non-user language:
+*"We use the contact information… we receive about non-users… only to provide our products
+to you and will not use it to contact, advertise, or market to such individuals."*
+
+**Zero of nine privacy policies surveyed mention Art. 14 or any indirect-collection duty.**
+The bar is on the floor; clearing it is cheap differentiation, consistent with §11's
+finding that trust is the incumbents' soft underbelly.
 
 ---
 
