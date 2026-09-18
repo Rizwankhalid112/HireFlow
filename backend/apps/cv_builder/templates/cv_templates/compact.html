@@ -1,0 +1,81 @@
+{% extends "cv_templates/base.html" %}
+{% comment %} Tight leading and small type to fit a long career on one page. {% endcomment %}
+
+{% block page_margin %}10mm 12mm{% endblock %}
+
+{% block styles %}
+  body { font-size: 8.8pt; line-height: 1.28; }
+
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12pt;
+           border-bottom: 1pt solid #334155; padding-bottom: 5pt; }
+  .name { font-size: 16pt; }
+  .title { font-size: 9pt; color: #4f46e5; font-weight: 600; }
+  .contact { font-size: 7.8pt; color: #64748b; text-align: right; }
+  .contact div { white-space: nowrap; }
+
+  .section { margin-top: 8pt; }
+  .section-title {
+    font-size: 7.8pt;
+    text-transform: uppercase;
+    letter-spacing: 1pt;
+    color: #4f46e5;
+    font-weight: 700;
+    margin-bottom: 4pt;
+  }
+
+  .entry { margin-bottom: 6pt; }
+  .entry-head { display: flex; justify-content: space-between; gap: 8pt; }
+  .entry-title { font-size: 9.2pt; font-weight: 700; }
+  .entry-sub { font-size: 8.4pt; color: #475569; }
+  .entry-date { font-size: 8pt; color: #64748b; white-space: nowrap; }
+
+  .bullets { margin-top: 1.5pt; }
+  .bullets li { padding-left: 8pt; position: relative; margin-bottom: 0.5pt; }
+  .bullets li::before { content: "•"; position: absolute; left: 0; color: #94a3b8; }
+
+  /* Two columns keeps a long skill list from eating vertical space. */
+  .skill-cols { column-count: 2; column-gap: 14pt; font-size: 8.4pt; color: #475569; }
+  .skill-cols div { break-inside: avoid; margin-bottom: 1pt; }
+
+  .tech { font-size: 7.8pt; color: #64748b; }
+  .meta-list li { margin-bottom: 1.5pt; }
+{% endblock %}
+
+{% block body %}
+  <header>
+    <div>
+      <h1 class="name">{{ full_name }}</h1>
+      {% if professional_title %}<div class="title">{{ professional_title }}</div>{% endif %}
+    </div>
+    <div class="contact">
+      {% for line in contact_lines %}<div>{{ line }}</div>{% endfor %}
+      {% for link in links %}<div>{{ link.url }}</div>{% endfor %}
+    </div>
+  </header>
+
+  {% if summary %}
+    <div class="section"><div class="section-title">Summary</div><p>{{ summary }}</p></div>
+  {% endif %}
+
+  {% if skills_grouped %}
+    <div class="section">
+      <div class="section-title">Skills</div>
+      <div class="skill-cols">
+        {% for group in skills_grouped %}
+          <div><strong>{{ group.category }}:</strong> {{ group.items|join:", " }}</div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% include "cv_templates/_sections.html" %}
+
+  {% if languages %}
+    <div class="section">
+      <div class="section-title">Languages</div>
+      <div class="tech">
+        {% for language in languages %}{{ language.name }}{% if language.proficiency %} ({{ language.proficiency }}){% endif %}{% if not forloop.last %} · {% endif %}{% endfor %}
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

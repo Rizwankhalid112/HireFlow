@@ -1,0 +1,646 @@
+{
+  "info": {
+    "name": "HireFlow - CV Builder API",
+    "description": "Test all CV Builder endpoints (Steps 2-6).\n\nSetup:\n1. Set collection variables: base_url, email, password\n2. Run Auth > Login (saves access_token automatically)\n3. Run folders in order: Profile → Work Experience → Education → Skills → Projects → Certifications → Languages\n\nBase URL: http://localhost/api (via nginx) or http://localhost:8000/api (direct backend)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost/api" },
+    { "key": "email", "value": "test@example.com" },
+    { "key": "password", "value": "testpass123" },
+    { "key": "access_token", "value": "" },
+    { "key": "experience_id", "value": "" },
+    { "key": "bullet_id", "value": "" },
+    { "key": "education_id", "value": "" },
+    { "key": "skill_id", "value": "" },
+    { "key": "canonical_id", "value": "" },
+    { "key": "project_id", "value": "" },
+    { "key": "certification_id", "value": "" },
+    { "key": "language_id", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "0 - Auth (run first)",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    pm.collectionVariables.set('access_token', pm.response.json().access);",
+                  "    pm.test('Login OK', () => pm.response.to.have.status(200));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{base_url}}/auth/login/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 - Profile",
+      "item": [
+        {
+          "name": "Create Profile (POST)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/cv/profile/"
+          }
+        },
+        {
+          "name": "Get Profile (GET)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cv/profile/"
+          }
+        },
+        {
+          "name": "Update Profile (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Muhammad Rizwan\",\n  \"professional_title\": \"Full Stack Developer\",\n  \"email\": \"rizwan@example.com\",\n  \"phone\": \"+923001234567\",\n  \"city\": \"Lahore\",\n  \"country\": \"Pakistan\",\n  \"linkedin_url\": \"linkedin.com/in/rizwan\",\n  \"github_url\": \"github.com/rizwan\",\n  \"portfolio_url\": \"https://rizwan.dev\",\n  \"summary\": \"Full stack developer with 3+ years building scalable web apps using Django, React, and PostgreSQL. Passionate about clean code and user experience.\",\n  \"template_id\": \"minimal\"\n}"
+            },
+            "url": "{{base_url}}/cv/profile/"
+          }
+        },
+        {
+          "name": "Patch Profile - Summary only (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"Updated summary with more than eighty characters to meet the completion scoring threshold for the summary section.\"\n}"
+            },
+            "url": "{{base_url}}/cv/profile/"
+          }
+        },
+        {
+          "name": "Get Completion (GET)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cv/profile/completion/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 - Work Experience",
+      "item": [
+        {
+          "name": "Create Experience (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('experience_id', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_name\": \"Inovaqo\",\n  \"role_title\": \"Full Stack Developer\",\n  \"employment_type\": \"full_time\",\n  \"location\": \"Lahore, Pakistan\",\n  \"location_type\": \"hybrid\",\n  \"start_month\": 1,\n  \"start_year\": 2023,\n  \"is_current\": true,\n  \"order\": 0\n}"
+            },
+            "url": "{{base_url}}/cv/work-experience/"
+          }
+        },
+        {
+          "name": "List Experiences (GET)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cv/work-experience/"
+          }
+        },
+        {
+          "name": "Update Experience (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_name\": \"Inovaqo\",\n  \"role_title\": \"Senior Full Stack Developer\",\n  \"employment_type\": \"full_time\",\n  \"location\": \"Lahore, Pakistan\",\n  \"location_type\": \"remote\",\n  \"start_month\": 1,\n  \"start_year\": 2023,\n  \"is_current\": true,\n  \"order\": 0\n}"
+            },
+            "url": "{{base_url}}/cv/work-experience/{{experience_id}}/"
+          }
+        },
+        {
+          "name": "Create Bullet 1 (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('bullet_id', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Built REST APIs with Django and PostgreSQL serving 50+ clients\",\n  \"order\": 0\n}"
+            },
+            "url": "{{base_url}}/cv/work-experience/{{experience_id}}/bullets/"
+          }
+        },
+        {
+          "name": "Create Bullet 2 (POST)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Wrote 180+ automated tests increasing coverage from 54% to 93%\",\n  \"order\": 1\n}"
+            },
+            "url": "{{base_url}}/cv/work-experience/{{experience_id}}/bullets/"
+          }
+        },
+        {
+          "name": "List Bullets (GET)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cv/work-experience/{{experience_id}}/bullets/"
+          }
+        },
+        {
+          "name": "Update Bullet (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Wrote 180+ automated tests increasing coverage from 54% to 93%\",\n  \"order\": 1\n}"
+            },
+            "url": "{{base_url}}/cv/work-experience/{{experience_id}}/bullets/{{bullet_id}}/"
+          }
+        },
+        {
+          "name": "Reorder Bullets (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordered_ids\": [\"{{bullet_id}}\"]\n}"
+            },
+            "url": "{{base_url}}/cv/work-experience/{{experience_id}}/bullets/reorder/"
+          }
+        },
+        {
+          "name": "Reorder Experiences (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordered_ids\": [\"{{experience_id}}\"]\n}"
+            },
+            "url": "{{base_url}}/cv/work-experience/reorder/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Education",
+      "item": [
+        {
+          "name": "Create Education (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('education_id', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"institution\": \"University of Engineering and Technology\",\n  \"degree_type\": \"bs\",\n  \"field_of_study\": \"Software Engineering\",\n  \"cgpa\": \"3.30\",\n  \"cgpa_scale\": \"4.0\",\n  \"start_year\": 2018,\n  \"end_year\": 2022,\n  \"is_current\": false,\n  \"thesis_title\": \"\",\n  \"achievements\": \"Dean's List\",\n  \"order\": 0\n}"
+            },
+            "url": "{{base_url}}/cv/education/"
+          }
+        },
+        {
+          "name": "List Education (GET)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cv/education/"
+          }
+        },
+        {
+          "name": "Update Education (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"institution\": \"University of Engineering and Technology\",\n  \"degree_type\": \"bs\",\n  \"field_of_study\": \"Computer Science\",\n  \"cgpa\": \"3.30\",\n  \"cgpa_scale\": \"4.0\",\n  \"start_year\": 2018,\n  \"end_year\": 2022,\n  \"is_current\": false,\n  \"order\": 0\n}"
+            },
+            "url": "{{base_url}}/cv/education/{{education_id}}/"
+          }
+        },
+        {
+          "name": "Reorder Education (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordered_ids\": [\"{{education_id}}\"]\n}"
+            },
+            "url": "{{base_url}}/cv/education/reorder/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 - Skills",
+      "item": [
+        {
+          "name": "Search Skills (GET)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 && pm.response.json().length > 0) {",
+                  "    pm.collectionVariables.set('canonical_id', pm.response.json()[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/cv/skills/search/?q=python",
+              "host": ["{{base_url}}"],
+              "path": ["cv", "skills", "search", ""],
+              "query": [{ "key": "q", "value": "python" }]
+            }
+          }
+        },
+        {
+          "name": "Add Skill via Canonical (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if ([200, 201].includes(pm.response.code)) {",
+                  "    pm.collectionVariables.set('skill_id', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"canonical_id\": \"{{canonical_id}}\",\n  \"proficiency\": \"advanced\"\n}"
+            },
+            "url": "{{base_url}}/cv/skills/"
+          }
+        },
+        {
+          "name": "Add Freetext Skill (POST)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Custom Tool\",\n  \"category\": \"Tools\",\n  \"proficiency\": \"intermediate\"\n}"
+            },
+            "url": "{{base_url}}/cv/skills/"
+          }
+        },
+        {
+          "name": "Bulk Add Skills (POST)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": [\n    { \"canonical_id\": \"{{canonical_id}}\", \"proficiency\": \"advanced\" },\n    { \"name\": \"FastAPI\", \"category\": \"Frameworks\", \"proficiency\": \"advanced\" },\n    { \"name\": \"React\", \"category\": \"Frameworks\", \"proficiency\": \"advanced\" },\n    { \"name\": \"Docker\", \"category\": \"Tools\", \"proficiency\": \"intermediate\" },\n    { \"name\": \"Redis\", \"category\": \"Databases\", \"proficiency\": \"intermediate\" }\n  ]\n}"
+            },
+            "url": "{{base_url}}/cv/skills/bulk-add/"
+          }
+        },
+        {
+          "name": "List Skills (GET)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cv/skills/"
+          }
+        },
+        {
+          "name": "Update Skill (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Python\",\n  \"category\": \"Languages\",\n  \"proficiency\": \"expert\",\n  \"is_featured\": true\n}"
+            },
+            "url": "{{base_url}}/cv/skills/{{skill_id}}/"
+          }
+        },
+        {
+          "name": "Reorder Skills (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordered_ids\": [\"{{skill_id}}\"]\n}"
+            },
+            "url": "{{base_url}}/cv/skills/reorder/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 - Projects",
+      "item": [
+        {
+          "name": "Create Project (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('project_id', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"HireFlow\",\n  \"subtitle\": \"Job Application Tracker\",\n  \"description\": \"SaaS platform for tracking job applications with Kanban board and analytics.\",\n  \"tech_stack\": [\"Django\", \"React\", \"PostgreSQL\", \"Redis\"],\n  \"project_url\": \"https://github.com/example/hireflow\",\n  \"start_year\": 2024,\n  \"is_ongoing\": true,\n  \"is_professional\": false,\n  \"order\": 0\n}"
+            },
+            "url": "{{base_url}}/cv/projects/"
+          }
+        },
+        {
+          "name": "List Projects (GET)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cv/projects/"
+          }
+        },
+        {
+          "name": "Update Project (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"HireFlow\",\n  \"subtitle\": \"Job Application Tracker\",\n  \"description\": \"Updated description.\",\n  \"tech_stack\": [\"Django\", \"React\"],\n  \"start_year\": 2024,\n  \"is_ongoing\": true,\n  \"order\": 0\n}"
+            },
+            "url": "{{base_url}}/cv/projects/{{project_id}}/"
+          }
+        },
+        {
+          "name": "Reorder Projects (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordered_ids\": [\"{{project_id}}\"]\n}"
+            },
+            "url": "{{base_url}}/cv/projects/reorder/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 - Certifications",
+      "item": [
+        {
+          "name": "Create Certification (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('certification_id', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"AWS Certified Developer\",\n  \"issuing_organization\": \"Amazon Web Services\",\n  \"issue_month\": 6,\n  \"issue_year\": 2024,\n  \"expiry_year\": 2027,\n  \"credential_url\": \"https://aws.amazon.com/verification\",\n  \"order\": 0\n}"
+            },
+            "url": "{{base_url}}/cv/certifications/"
+          }
+        },
+        {
+          "name": "List Certifications (GET)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cv/certifications/"
+          }
+        },
+        {
+          "name": "Update Certification (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"AWS Certified Developer - Associate\",\n  \"issuing_organization\": \"Amazon Web Services\",\n  \"issue_month\": 6,\n  \"issue_year\": 2024,\n  \"order\": 0\n}"
+            },
+            "url": "{{base_url}}/cv/certifications/{{certification_id}}/"
+          }
+        },
+        {
+          "name": "Reorder Certifications (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordered_ids\": [\"{{certification_id}}\"]\n}"
+            },
+            "url": "{{base_url}}/cv/certifications/reorder/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7 - Languages",
+      "item": [
+        {
+          "name": "Create Language (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('language_id', pm.response.json().id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language_name\": \"English\",\n  \"proficiency\": \"fluent\",\n  \"order\": 0\n}"
+            },
+            "url": "{{base_url}}/cv/languages/"
+          }
+        },
+        {
+          "name": "List Languages (GET)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cv/languages/"
+          }
+        },
+        {
+          "name": "Update Language (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language_name\": \"Urdu\",\n  \"proficiency\": \"native\",\n  \"order\": 1\n}"
+            },
+            "url": "{{base_url}}/cv/languages/{{language_id}}/"
+          }
+        },
+        {
+          "name": "Reorder Languages (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordered_ids\": [\"{{language_id}}\"]\n}"
+            },
+            "url": "{{base_url}}/cv/languages/reorder/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "8 - Cleanup (optional)",
+      "item": [
+        {
+          "name": "Delete Bullet (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/cv/work-experience/{{experience_id}}/bullets/{{bullet_id}}/"
+          }
+        },
+        {
+          "name": "Delete Experience (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/cv/work-experience/{{experience_id}}/"
+          }
+        },
+        {
+          "name": "Delete Education (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/cv/education/{{education_id}}/"
+          }
+        },
+        {
+          "name": "Delete Skill (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/cv/skills/{{skill_id}}/"
+          }
+        },
+        {
+          "name": "Delete Project (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/cv/projects/{{project_id}}/"
+          }
+        },
+        {
+          "name": "Delete Certification (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/cv/certifications/{{certification_id}}/"
+          }
+        },
+        {
+          "name": "Delete Language (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/cv/languages/{{language_id}}/"
+          }
+        }
+      ]
+    }
+  ]
+}
