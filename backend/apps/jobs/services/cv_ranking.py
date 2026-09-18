@@ -13,7 +13,7 @@ to do this.
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db.models import F
 
-from apps.cv_builder.services.ai.guardrails import lookup_canonical
+from apps.cv_builder.services.ai.guardrails import lookup_canonical_bulk
 
 # More than this and the tsquery gets long without improving ranking — the tail
 # of a skills list is rarely what makes a job a good match.
@@ -34,14 +34,21 @@ def cv_skill_terms(profile):
     advertising "PostgreSQL". Both forms are kept, because the job text might
     use either.
     """
+    names = [
+        (skill.name or '').strip()
+        for skill in profile.skills.all()[:MAX_SKILLS]
+    ]
+    # Resolved in one batch: per-name lookups made this a 25-query endpoint.
+    canonicals = lookup_canonical_bulk(names)
+
     terms = []
     seen = set()
 
-    for skill in profile.skills.all()[:MAX_SKILLS]:
-        name = (skill.name or '').strip()
+    for name in names:
         if not name:
             continue
-        for candidate in {name, getattr(lookup_canonical(name), 'canonical_name', None)}:
+        canonical = getattr(canonicals.get(name.lower()), 'canonical_name', None)
+        for candidate in (name, canonical):
             if candidate and candidate.casefold() not in seen:
                 seen.add(candidate.casefold())
                 terms.append(candidate)

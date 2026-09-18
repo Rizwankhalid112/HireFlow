@@ -163,6 +163,14 @@ class Job(models.Model):
             # switches to the index as the table grows. Do not "fix" a seq scan
             # seen on a small dev dataset.
             GinIndex(fields=['search_vector'], name='job_search_vector_gin'),
+            # Substring search on the raw location. A leading wildcard cannot
+            # use a btree, so without trigrams `?location=london` is the one
+            # filter on this table guaranteed to sequential-scan.
+            GinIndex(
+                fields=['location_raw'],
+                opclasses=['gin_trgm_ops'],
+                name='job_location_trgm_idx',
+            ),
             # The default listing: newest first.
             models.Index(fields=['-posted_at'], name='job_posted_desc_idx'),
             # Filter by location or remote type, then order by date. Composite

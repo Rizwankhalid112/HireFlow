@@ -15,8 +15,10 @@ import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from django.conf import settings
+from django.core.cache import cache
 from django.utils import timezone
 
+from apps.jobs.constants import JOB_STATS_CACHE_KEY
 from apps.jobs.models import TrackedCompany
 from apps.jobs.services.fetchers import FetchError, fetch_for, pause
 from apps.jobs.services.ingest import purge_stale, upsert_jobs
@@ -91,6 +93,11 @@ def run_gather(companies=None, purge_days=None, workers=MAX_WORKERS):
 
     purge_days = purge_days if purge_days is not None else getattr(settings, 'JOBS_RETENTION_DAYS', 45)
     purged = purge_stale(purge_days)
+
+    # The stats endpoint caches a whole-table count. This run is the only thing
+    # that changes it, so drop the entry rather than making every reader wait
+    # out the TTL to see tonight's jobs.
+    cache.delete(JOB_STATS_CACHE_KEY)
 
     summary = {
         'companies': len(companies),

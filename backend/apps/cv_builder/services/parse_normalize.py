@@ -27,7 +27,7 @@ from decimal import Decimal, InvalidOperation
 
 from django.utils import timezone
 
-from apps.cv_builder.services.ai.guardrails import lookup_canonical
+from apps.cv_builder.services.ai.guardrails import lookup_canonical_bulk
 from apps.cv_builder.utils import normalize_profile_url
 
 # Field ceilings, taken from the models. Exceeding one raises DataError at write
@@ -292,11 +292,17 @@ def _skills(rows, extra=()):
     `extra` carries skills rescued from the languages section (see
     `_split_languages`), so they go through the same resolution as any other.
     """
+    candidates = [
+        (row, _text(getattr(row, 'name', None) or getattr(row, 'language_name', ''), 'skill_name'))
+        for row in list(rows) + list(extra)
+    ]
+    # One batch for the whole section: a 30-skill CV was 30-60 queries.
+    canonicals = lookup_canonical_bulk(name for _, name in candidates)
+
     seen = set()
     out = []
 
-    for row in list(rows) + list(extra):
-        name = _text(getattr(row, 'name', None) or getattr(row, 'language_name', ''), 'skill_name')
+    for row, name in candidates:
         if not name:
             continue
 
@@ -305,7 +311,7 @@ def _skills(rows, extra=()):
             continue
         seen.add(key)
 
-        canonical = lookup_canonical(name)
+        canonical = canonicals.get(name.lower())
         out.append({
             # The canonical spelling wins: 'nodejs' and 'Node.js' should not
             # become two chips on the rendered CV.
@@ -332,15 +338,17 @@ def _split_languages(rows):
 
     Deterministic, free, and it does not depend on the model having got it right.
     """
+    named = [(row, _text(row.language_name, 'language_name')) for row in rows]
+    canonicals = lookup_canonical_bulk(name for _, name in named)
+
     spoken = []
     misfiled = []
 
-    for row in rows:
-        name = _text(row.language_name, 'language_name')
+    for row, name in named:
         if not name:
             continue
 
-        if lookup_canonical(name) is not None:
+        if canonicals.get(name.lower()) is not None:
             misfiled.append(row)
             continue
 

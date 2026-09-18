@@ -10,7 +10,7 @@ from apps.cv_builder.serializers.cv_profile import (
     CVProfileReadSerializer,
     CVProfileWriteSerializer,
 )
-from apps.cv_builder.services.completion import calculate_section_completion, compute_completion
+from apps.cv_builder.services.completion import calculate_section_completion, score_sections
 from apps.cv_builder.services.reset_cv import ALL_SECTIONS, delete_cv, reset_cv
 from apps.cv_builder.utils import get_user_cv_profile
 
@@ -106,9 +106,12 @@ class CVProfileCompletionView(APIView):
 
     def get(self, request):
         profile = get_user_cv_profile(request.user)
-        score, is_complete = compute_completion(profile)
+        # Sections computed once and scored from that: the pair of calls this
+        # replaced ran every section query twice per request.
+        sections = calculate_section_completion(profile)
+        score, is_complete = score_sections(sections)
         return Response({
             'completion_score': score,
             'is_complete': is_complete,
-            'section_completion': calculate_section_completion(profile),
+            'section_completion': sections,
         })

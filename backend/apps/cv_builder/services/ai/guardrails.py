@@ -13,6 +13,8 @@ rather than trust.
 import logging
 import re
 
+from django.db.models import Q
+
 from apps.cv_builder.models import SkillCanonical
 from apps.cv_builder.services.metric_extractor import extract_metric
 
@@ -126,6 +128,52 @@ def lookup_canonical(name):
     return None
 
 
+def lookup_canonical_bulk(names):
+    """`lookup_canonical` for many names, in two queries instead of two per name.
+
+    Every caller resolves a *list* of skills — a CV's skills when ranking jobs,
+    the model's suggestions, a parsed CV's skill section — and calling the
+    single-name version in a loop is a straight N+1. A 25-skill CV cost 25-50
+    round trips before this existed.
+
+    The precedence is the same and it is load-bearing: an exact canonical name
+    beats an alias, so `Java` cannot be relabelled `JavaScript` by whichever row
+    the database happened to return first.
+
+    Returns `{lowercased name: SkillCanonical}`, omitting names that matched
+    nothing.
+    """
+    wanted = {n.strip().lower() for n in names if (n or '').strip()}
+    if not wanted:
+        return {}
+
+    exact = Q()
+    for name in wanted:
+        exact |= Q(canonical_name__iexact=name)
+
+    resolved = {
+        row.canonical_name.lower(): row
+        for row in SkillCanonical.objects.filter(exact)
+    }
+
+    missing = wanted - resolved.keys()
+    if not missing:
+        return resolved
+
+    alias_match = Q()
+    for name in missing:
+        alias_match |= Q(aliases__icontains=name)
+
+    # `-is_popular` mirrors the single-name path: when two rows both claim an
+    # alias, the popular one wins rather than an arbitrary row.
+    for row in SkillCanonical.objects.filter(alias_match).order_by('-is_popular'):
+        aliases = {alias.lower() for alias in (row.aliases or [])}
+        for name in missing & aliases:
+            resolved.setdefault(name, row)
+
+    return resolved
+
+
 def resolve_skills(candidates):
     """Match suggested skill names against the canonical table.
 
@@ -134,14 +182,16 @@ def resolve_skills(candidates):
     name is still offered, but as freetext, exactly as a hand-typed skill would
     be. This is what keeps the verified/unverified distinction meaningful.
     """
+    named = [(candidate, (candidate.name or '').strip()) for candidate in candidates]
+    canonicals = lookup_canonical_bulk(name for _, name in named)
+
     resolved = []
 
-    for candidate in candidates:
-        name = (candidate.name or '').strip()
+    for candidate, name in named:
         if not name:
             continue
 
-        canonical = lookup_canonical(name)
+        canonical = canonicals.get(name.lower())
 
         resolved.append({
             'name': canonical.canonical_name if canonical else name,
