@@ -65,20 +65,20 @@ export function UploadDropzone({ onFile, status, progress, error, isUploading, o
 
   if (busy) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-6 text-center dark:border-slate-700 dark:bg-slate-900">
+      <div className="rounded-xl border border-line bg-surface p-6 text-center">
         <Spinner />
-        <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-200">
+        <p className="mt-3 text-sm font-medium text-ink">
           {isUploading ? 'Uploading…' : STAGE_LABEL[status]}
         </p>
         {isUploading && progress > 0 ? (
-          <div className="mx-auto mt-3 h-1.5 w-48 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+          <div className="mx-auto mt-3 h-1.5 w-48 overflow-hidden rounded-full bg-surface-3">
             <div
-              className="h-full rounded-full bg-slate-900 transition-[width] dark:bg-slate-100"
+              className="h-full rounded-full bg-accent transition-[width]"
               style={{ width: `${progress}%` }}
             />
           </div>
         ) : null}
-        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-2 text-xs text-subtle">
           This usually takes a few seconds. Nothing is changed on your CV until you review it.
         </p>
       </div>
@@ -96,14 +96,14 @@ export function UploadDropzone({ onFile, status, progress, error, isUploading, o
         onDrop={onDrop}
         className={`rounded-xl border-2 border-dashed p-6 text-center transition-colors ${
           dragging
-            ? 'border-slate-900 bg-slate-50 dark:border-slate-100 dark:bg-slate-800'
-            : 'border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-900'
+            ? 'border-accent bg-accent-soft'
+            : 'border-line-strong bg-surface'
         }`}
       >
-        <p className="text-sm font-medium text-slate-800 dark:text-slate-100">
+        <p className="text-sm font-medium text-ink">
           Import from an existing CV
         </p>
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-1 text-xs text-subtle">
           Drop a PDF or DOCX here, or choose a file. Max 5 MB.
         </p>
 
@@ -123,7 +123,7 @@ export function UploadDropzone({ onFile, status, progress, error, isUploading, o
           Choose a file
         </Button>
 
-        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-3 text-xs text-subtle">
           We read it and show you what we found. You choose what to keep.
         </p>
       </div>

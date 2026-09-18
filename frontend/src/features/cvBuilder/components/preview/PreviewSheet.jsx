@@ -21,9 +21,9 @@ export function PreviewSheet({ open, onClose, preview, template, profile, pageCo
   return (
     <Modal open={open} onClose={onClose} size="full">
       <div className="flex h-full min-h-0 flex-col">
-        <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-3 dark:border-slate-800">
+        <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
           <div className="flex min-w-0 items-center gap-2">
-            <h2 className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <h2 className="truncate text-sm font-semibold text-ink">
               {template?.name ?? 'Preview'}
             </h2>
             {pageCount > 0 ? (
@@ -52,7 +52,7 @@ export function PreviewSheet({ open, onClose, preview, template, profile, pageCo
         </div>
 
         <div
-          className="min-h-0 flex-1 overflow-auto bg-slate-100 p-4 dark:bg-slate-950"
+          className="min-h-0 flex-1 overflow-auto bg-surface-3 p-4"
           // Leave native pinch-zoom alone; the toggle above is a shortcut, not
           // a replacement for it.
           style={{ touchAction: 'pan-x pan-y pinch-zoom' }}

@@ -1,17 +1,7 @@
 import { FieldShell } from './FieldShell';
 import { Select } from './Select';
 
-export function SelectField({
-  id,
-  label,
-  error,
-  hint,
-  registration,
-  options,
-  placeholder,
-  className,
-  ...rest
-}) {
+export function SelectField({ id, label, error, hint, registration, options, placeholder, className, ...rest }) {
   return (
     <FieldShell id={id} label={label} error={error} hint={hint} className={className}>
       <Select

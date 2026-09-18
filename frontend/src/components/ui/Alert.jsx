@@ -1,16 +1,19 @@
+import { Icon } from './Icon';
+
 const variants = {
-  info: 'border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-100',
-  success:
-    'border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-100',
-  warning:
-    'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100',
-  error: 'border-red-200 bg-red-50 text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-100',
+  info: { box: 'border-accent-line bg-accent-soft text-accent', icon: 'info' },
+  success: { box: 'border-ok-line bg-ok-soft text-ok', icon: 'check' },
+  warning: { box: 'border-warn-line bg-warn-soft text-warn', icon: 'warning' },
+  error: { box: 'border-bad-line bg-bad-soft text-bad', icon: 'warning' },
 };
 
 export function Alert({ children, variant = 'info', className = '' }) {
+  const { box, icon } = variants[variant];
+
   return (
-    <div className={`rounded-lg border px-4 py-3 text-sm ${variants[variant]} ${className}`}>
-      {children}
+    <div className={`flex items-start gap-2.5 rounded-control border px-3 py-2.5 text-xs leading-5 ${box} ${className}`}>
+      <Icon name={icon} size={14} className="mt-0.5" />
+      <div className="min-w-0 flex-1">{children}</div>
     </div>
   );
 }

@@ -25,12 +25,12 @@ function TemplateCard({ template, selected, onSelect, disabled }) {
       aria-label={`Select the ${template.name} template`}
       className={`group flex flex-col overflow-hidden rounded-xl border text-left transition-all disabled:cursor-not-allowed disabled:opacity-60 ${
         selected
-          ? 'border-indigo-500 ring-2 ring-indigo-400 dark:ring-indigo-500'
-          : 'border-slate-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-lg dark:border-slate-800 dark:hover:border-indigo-700'
+          ? 'border-accent ring-2 ring-accent/30'
+          : 'border-line hover:-translate-y-0.5 hover:border-accent hover:shadow-pop'
       }`}
     >
       {/* A4 aspect so the card never reflows once the image arrives. */}
-      <div className="relative aspect-[1/1.414] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+      <div className="relative aspect-[1/1.414] w-full overflow-hidden bg-surface-3">
         {!loaded && !failed ? (
           <div className="absolute inset-0 flex items-center justify-center">
             <Spinner />
@@ -38,7 +38,7 @@ function TemplateCard({ template, selected, onSelect, disabled }) {
         ) : null}
 
         {failed ? (
-          <div className="absolute inset-0 flex items-center justify-center px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+          <div className="absolute inset-0 flex items-center justify-center px-4 text-center text-xs text-subtle">
             Preview unavailable
           </div>
         ) : (
@@ -55,23 +55,23 @@ function TemplateCard({ template, selected, onSelect, disabled }) {
         )}
 
         {selected ? (
-          <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white shadow">
+          <span className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-accent text-sm font-bold text-white shadow">
             ✓
           </span>
         ) : null}
       </div>
 
-      <div className="border-t border-slate-200 p-3 dark:border-slate-800">
+      <div className="border-t border-line p-3">
         <div className="flex items-center justify-between gap-2">
-          <span className="font-medium text-slate-900 dark:text-slate-100">{template.name}</span>
+          <span className="font-medium text-ink">{template.name}</span>
           {selected ? (
-            <span className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
+            <span className="text-xs font-medium text-accent">
               Selected
             </span>
           ) : null}
         </div>
 
-        <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">{template.description}</p>
+        <p className="mt-1 text-xs text-muted">{template.description}</p>
 
         <div className="mt-2 flex flex-wrap gap-1.5">
           {template.ats_safe ? (

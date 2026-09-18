@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 
-import { Alert, Badge, Button, Spinner } from '@/components/ui';
+import { Alert, Badge, Button, Icon, Spinner } from '@/components/ui';
 
 import { downloadPdf } from '../../utils/downloadPdf';
 
@@ -12,16 +12,10 @@ const PdfCanvas = lazy(() =>
 
 function EmptyPreview() {
   return (
-    <div className="rounded-xl border border-dashed border-slate-300 px-4 py-12 text-center dark:border-slate-700">
-      <p className="text-3xl" aria-hidden="true">
-        📄
-      </p>
-      <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-200">
-        Your CV will appear here
-      </p>
-      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-        Add your name or a summary and this updates as you go.
-      </p>
+    <div className="flex flex-col items-center gap-2 rounded-card border border-dashed border-line-strong px-4 py-12 text-center">
+      <Icon name="cv" size={22} className="text-subtle" />
+      <p className="text-[13px] font-medium text-ink">Your CV will appear here</p>
+      <p className="text-[11px] text-subtle">Add your name or a summary and this updates as you go.</p>
     </div>
   );
 }
@@ -30,9 +24,9 @@ function PaneHeader({ template, pageCount, busy, preview, profile }) {
   const { data, isEmpty, refresh, auto, setAuto } = preview;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3 dark:border-slate-800">
+    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3.5 py-2.5">
       <div className="flex min-w-0 items-center gap-2">
-        <h2 className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+        <h2 className="truncate text-sm font-semibold text-ink">
           {template?.name ?? 'Preview'}
         </h2>
         {pageCount > 0 ? (
@@ -41,20 +35,20 @@ function PaneHeader({ template, pageCount, busy, preview, profile }) {
           </Badge>
         ) : null}
         {busy ? (
-          <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-            <span className="h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600" />
+          <span className="inline-flex items-center gap-1.5 text-xs text-subtle">
+            <span className="h-3 w-3 animate-spin rounded-full border-2 border-line-strong border-t-accent" />
             Updating…
           </span>
         ) : null}
       </div>
 
       <div className="flex items-center gap-2">
-        <label className="inline-flex cursor-pointer items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
+        <label className="inline-flex cursor-pointer items-center gap-1.5 text-xs text-muted">
           <input
             type="checkbox"
             checked={auto}
             onChange={(event) => setAuto(event.target.checked)}
-            className="h-3.5 w-3.5 rounded border-slate-300 text-indigo-600 focus:ring-2 focus:ring-indigo-200 dark:border-slate-600 dark:bg-slate-900"
+            className="h-3.5 w-3.5 rounded border-line-strong text-accent focus:ring-2 ring-accent/25"
           />
           Auto
         </label>
@@ -113,16 +107,16 @@ export function PreviewPane({
         />
       ) : null}
 
-      <div className={`min-h-0 flex-1 ${showHeader ? 'overflow-y-auto pt-4' : ''}`}>
+      <div className={`min-h-0 flex-1 ${showHeader ? 'overflow-y-auto bg-surface-3 p-3' : ''}`}>
         {/* Auto off is a deliberate choice, so it gets a quiet note rather than
             a warning — but the user must know the document is not current. */}
         {isStale && !auto ? (
-          <p className="mb-3 rounded-lg bg-slate-100 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+          <p className="mb-3 rounded-lg bg-surface-3 px-3 py-2 text-xs text-muted">
             Your CV has changed since this render.{' '}
             <button
               type="button"
               onClick={refresh}
-              className="font-medium text-indigo-600 underline dark:text-indigo-400"
+              className="font-medium text-accent underline"
             >
               Refresh
             </button>{' '}

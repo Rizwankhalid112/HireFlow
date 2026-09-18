@@ -24,8 +24,8 @@ export function ForgotPasswordForm() {
       noValidate
     >
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Forgot password</h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400">
+        <h1 className="text-2xl font-semibold text-ink">Forgot password</h1>
+        <p className="text-sm text-muted">
           Enter your email and we&apos;ll send you a reset link if an account exists.
         </p>
       </div>
@@ -50,8 +50,8 @@ export function ForgotPasswordForm() {
         Send reset link
       </Button>
 
-      <p className="text-center text-sm text-slate-600 dark:text-slate-400">
-        <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-700">
+      <p className="text-center text-sm text-muted">
+        <Link to="/login" className="font-medium text-accent hover:text-accent">
           Back to sign in
         </Link>
       </p>

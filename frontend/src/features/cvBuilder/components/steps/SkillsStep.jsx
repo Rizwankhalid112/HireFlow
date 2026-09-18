@@ -98,15 +98,15 @@ function SkillSearchInput({ onPick, onFreeText, disabled }) {
 
       {open && term.trim() ? (
         <div
-          className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
+          className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-line bg-surface shadow-lg"
           onMouseDown={() => clearTimeout(blurTimer.current)}
         >
           {isFetching ? (
-            <p className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400">Searching…</p>
+            <p className="px-3 py-2 text-sm text-subtle">Searching…</p>
           ) : null}
 
           {!isFetching && suggestions.length === 0 ? (
-            <p className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400">
+            <p className="px-3 py-2 text-sm text-subtle">
               No match. Press Enter to add “{term.trim()}” as a custom skill.
             </p>
           ) : null}
@@ -117,12 +117,12 @@ function SkillSearchInput({ onPick, onFreeText, disabled }) {
                 <button
                   type="button"
                   onClick={() => pick(canonical)}
-                  className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm text-slate-700 hover:bg-indigo-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                  className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm text-ink hover:bg-accent-soft"
                 >
                   <span className="font-medium">{canonical.canonical_name}</span>
                   <span className="flex items-center gap-2">
                     {canonical.is_popular ? <Badge variant="brand">Popular</Badge> : null}
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                    <span className="text-xs text-subtle">
                       {canonical.category}
                     </span>
                   </span>
@@ -135,7 +135,7 @@ function SkillSearchInput({ onPick, onFreeText, disabled }) {
             <button
               type="button"
               onClick={addFreeText}
-              className="w-full border-t border-slate-200 px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="w-full border-t border-line px-3 py-2 text-left text-sm text-muted hover:bg-surface-2"
             >
               Add “{term.trim()}” as a custom skill
             </button>
@@ -148,10 +148,10 @@ function SkillSearchInput({ onPick, onFreeText, disabled }) {
 
 function SkillRow({ skill, index, total, onMoveUp, onMoveDown, onDelete, onChange, reordering }) {
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-line p-3">
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-medium text-slate-900 dark:text-slate-100">{skill.name}</span>
+          <span className="font-medium text-ink">{skill.name}</span>
           {skill.is_verified ? (
             <Badge variant="success">✓ Verified</Badge>
           ) : (
@@ -342,7 +342,7 @@ export function SkillsStep() {
                   <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
                     Common for your target role — not on your CV yet
                   </p>
-                  <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                  <p className="mt-0.5 text-xs text-subtle">
                     Only add these if you can talk about them in an interview.
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -377,7 +377,7 @@ export function SkillsStep() {
         ) : (
           <>
             {remaining > 0 ? (
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-subtle">
                 {remaining} more {remaining === 1 ? 'skill' : 'skills'} to earn this section&apos;s
                 points.
               </p>

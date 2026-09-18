@@ -32,20 +32,20 @@ export function PhotoUploader({ photoUrl }) {
   };
 
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-slate-200 p-4 dark:border-slate-800">
-      <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
+    <div className="flex items-center gap-4 rounded-xl border border-line p-4">
+      <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border border-line bg-surface-3">
         {photoUrl ? (
           <img src={photoUrl} alt="Your CV photo" className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-2xl text-slate-400">
+          <div className="flex h-full w-full items-center justify-center text-2xl text-subtle">
             👤
           </div>
         )}
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Profile photo</p>
-        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-sm font-medium text-ink">Profile photo</p>
+        <p className="mt-0.5 text-xs text-subtle">
           JPEG, PNG or WebP · up to 2 MB. Resized to 600×600 and stripped of location data.
         </p>
 

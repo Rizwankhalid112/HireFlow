@@ -49,17 +49,17 @@ function GapChips({ gaps, onAnswer }) {
 
 function VariantCard({ variant, onUse, onEdit }) {
   return (
-    <li className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
-      <p className="text-sm text-slate-800 dark:text-slate-100">{variant.text}</p>
+    <li className="rounded-lg border border-line bg-surface p-3">
+      <p className="text-sm text-ink">{variant.text}</p>
 
       {variant.why ? (
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{variant.why}</p>
+        <p className="mt-1 text-xs text-subtle">{variant.why}</p>
       ) : null}
 
       {/* Provenance, not decoration: it shows which of the user's own words the
           line rests on, which is what makes the claim checkable. */}
       {variant.grounded_in?.length ? (
-        <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-1.5 text-xs text-subtle">
           From your text: {variant.grounded_in.slice(0, 3).join(' · ')}
         </p>
       ) : null}
@@ -139,7 +139,7 @@ export function SuggestionPanel({
   }
 
   return (
-    <div className="mt-3 rounded-lg border border-dashed border-indigo-200 bg-indigo-50/40 p-3 dark:border-indigo-900 dark:bg-indigo-950/30">
+    <div className="mt-3 rounded-lg border border-dashed border-accent bg-accent-soft/40 p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Button
@@ -185,7 +185,7 @@ export function SuggestionPanel({
       ) : null}
 
       {attempts >= MAX_REGENERATIONS ? (
-        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-2 text-xs text-subtle">
           That&apos;s three tries — the next one rarely helps. Editing by hand from here is
           usually faster.
         </p>
@@ -237,7 +237,7 @@ export function SuggestionPanel({
           />
 
           {result?.rejected > 0 ? (
-            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+            <p className="mt-2 text-xs text-subtle">
               {result.rejected} suggestion{result.rejected === 1 ? '' : 's'} withheld — {result.rejected === 1 ? 'it' : 'they'} contained
               figures you hadn&apos;t mentioned.
             </p>
@@ -246,7 +246,7 @@ export function SuggestionPanel({
       ) : null}
 
       {active && !mutation.isPending && mutation.isSuccess && !gotSomething && !status ? (
-        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-3 text-xs text-subtle">
           Nothing solid to suggest from what&apos;s here yet. Add a little more detail and try
           again.
         </p>

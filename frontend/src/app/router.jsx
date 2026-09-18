@@ -1,24 +1,28 @@
 import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import { Spinner } from '@/components/ui';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 import { PublicOnlyRoute } from '@/routes/PublicOnlyRoute';
+import { Spinner } from '@/components/ui';
 
-const LandingPage = lazy(() => import('@/pages/LandingPage'));
-const HomePage = lazy(() => import('@/pages/HomePage'));
+import { routeLoaders } from './routes';
+
+/* Loaders live in routes.js so the sidebar can warm a chunk on hover — see the
+   note there. `lazy()` resolves instantly when the prefetch already ran. */
+const LandingPage = lazy(routeLoaders['/']);
+const HomePage = lazy(routeLoaders['/home']);
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
-const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage'));
-const RegisterPage = lazy(() => import('@/features/auth/pages/RegisterPage'));
-const ForgotPasswordPage = lazy(() => import('@/features/auth/pages/ForgotPasswordPage'));
-const ResetPasswordPage = lazy(() => import('@/features/auth/pages/ResetPasswordPage'));
-const VerifyEmailPage = lazy(() => import('@/features/auth/pages/VerifyEmailPage'));
-const CVBuilderPage = lazy(() => import('@/features/cvBuilder/pages/CVBuilderPage'));
-const JobMatchPage = lazy(() => import('@/features/jobMatch/pages/JobMatchPage'));
-const JobsPage = lazy(() => import('@/features/jobs/pages/JobsPage'));
+const LoginPage = lazy(routeLoaders['/login']);
+const RegisterPage = lazy(routeLoaders['/register']);
+const ForgotPasswordPage = lazy(routeLoaders['/forgot-password']);
+const ResetPasswordPage = lazy(routeLoaders['/reset-password']);
+const VerifyEmailPage = lazy(routeLoaders['/verify-email']);
+const CVBuilderPage = lazy(routeLoaders['/cv-builder']);
+const JobMatchPage = lazy(routeLoaders['/job-match']);
+const JobsPage = lazy(routeLoaders['/jobs']);
 
 function PageLoader() {
   return (

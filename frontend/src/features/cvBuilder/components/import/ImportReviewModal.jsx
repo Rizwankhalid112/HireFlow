@@ -75,8 +75,8 @@ function ChoiceButtons({ value, onChange, mergeLabel, hasExisting }) {
             onClick={() => onChange(option.value)}
             className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
               active
-                ? 'border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900'
-                : 'border-slate-300 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800'
+                ? 'border-accent bg-accent text-accent-on'
+                : 'border-line-strong bg-surface text-muted hover:bg-surface-2'
             }`}
           >
             {option.label}
@@ -131,24 +131,24 @@ function UnmappedSections({ sections }) {
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/50">
-      <p className="text-xs font-medium text-slate-700 dark:text-slate-200">
+    <div className="rounded-lg border border-line bg-surface-2 p-3">
+      <p className="text-xs font-medium text-ink">
         We found {sections.length} section{sections.length === 1 ? '' : 's'} HireFlow has
         nowhere to put yet
       </p>
-      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+      <p className="mt-1 text-xs text-subtle">
         Nothing here will be imported. Copy anything you want to keep before you finish.
       </p>
       <div className="mt-2 space-y-2">
         {sections.map((section) => (
           <details
             key={section.heading}
-            className="rounded border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900"
+            className="rounded border border-line bg-surface p-2"
           >
-            <summary className="cursor-pointer text-xs font-medium text-slate-700 dark:text-slate-200">
+            <summary className="cursor-pointer text-xs font-medium text-ink">
               {section.heading}
             </summary>
-            <p className="mt-1.5 whitespace-pre-wrap text-xs text-slate-600 dark:text-slate-400">
+            <p className="mt-1.5 whitespace-pre-wrap text-xs text-muted">
               {section.content}
             </p>
           </details>
@@ -223,14 +223,14 @@ export function ImportReviewModal({ open, onClose, parsed, existing, onApply, is
           return (
             <div
               key={section.key}
-              className="rounded-lg border border-slate-200 p-3 dark:border-slate-700"
+              className="rounded-lg border border-line p-3"
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  <p className="text-sm font-medium text-ink">
                     {section.label}
                   </p>
-                  <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                  <p className="mt-0.5 text-xs text-subtle">
                     Found {found} · you have {have}
                   </p>
                 </div>
@@ -243,7 +243,7 @@ export function ImportReviewModal({ open, onClose, parsed, existing, onApply, is
               </div>
 
               {rows.length ? (
-                <p className="mt-2 truncate text-xs text-slate-500 dark:text-slate-400">
+                <p className="mt-2 truncate text-xs text-subtle">
                   {rows.slice(0, 3).map((row, index) => rowLabel(section.key, row, index)).join(' · ')}
                   {rows.length > 3 ? ` and ${rows.length - 3} more` : ''}
                 </p>

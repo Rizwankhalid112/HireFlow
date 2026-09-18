@@ -27,7 +27,7 @@ function BulletComposer({ value, onChange, onSubmit, onCancel, loading, submitLa
         placeholder="Built a CI pipeline that cut deploy time by 40% across 12 services."
       />
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-subtle">
           {tooShort
             ? `At least ${MIN_LENGTH} characters.`
             : 'Include a number where you can — metrics are detected automatically.'}
@@ -104,16 +104,16 @@ export function BulletList({ experienceId, bullets = [] }) {
   };
 
   return (
-    <div className="space-y-3 border-t border-slate-200 pt-3 dark:border-slate-800">
+    <div className="space-y-3 border-t border-line pt-3">
       {bullets.length === 0 && !adding ? (
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-subtle">
           No bullets yet. Two or more bullets on at least one role earns the experience points.
         </p>
       ) : null}
 
       <ul className="space-y-2">
         {bullets.map((bullet, index) => (
-          <li key={bullet.id} className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800/50">
+          <li key={bullet.id} className="rounded-lg bg-surface-2 p-3">
             {editingId === bullet.id ? (
               <BulletComposer
                 value={editingText}
@@ -126,7 +126,7 @@ export function BulletList({ experienceId, bullets = [] }) {
             ) : (
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm text-slate-700 dark:text-slate-200">{bullet.text}</p>
+                  <p className="text-sm text-ink">{bullet.text}</p>
 
                   {/* impact_metric and skills_demonstrated are derived server-side. */}
                   {bullet.impact_metric || bullet.skills_demonstrated?.length ? (

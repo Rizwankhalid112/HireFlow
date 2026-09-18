@@ -22,7 +22,7 @@ export default function VerifyEmailPage() {
     return (
       <div className="space-y-4 text-center">
         <Spinner />
-        <p className="text-sm text-slate-600 dark:text-slate-400">Verifying your email...</p>
+        <p className="text-sm text-muted">Verifying your email...</p>
       </div>
     );
   }

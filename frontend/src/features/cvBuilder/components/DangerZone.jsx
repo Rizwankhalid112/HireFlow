@@ -57,16 +57,16 @@ export function DangerZone({ onCleared }) {
           for something used once or twice. */}
       <details className="group">
         <summary className="cursor-pointer list-none">
-          <span className="text-sm font-semibold text-slate-700 group-open:text-slate-900 dark:text-slate-300 dark:group-open:text-slate-100">
+          <span className="text-sm font-semibold text-ink">
             Clear or delete
           </span>
-          <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">
+          <span className="ml-2 text-xs text-subtle">
             start a section again, or clear the whole CV
           </span>
         </summary>
 
       <div className="mt-4">
-        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+        <p className="text-xs font-medium text-subtle">
           Clear one section
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
@@ -80,7 +80,7 @@ export function DangerZone({ onCleared }) {
                 sections: [section.key],
                 label: section.label,
               })}
-              className="rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-600 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-700 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:border-red-800 dark:hover:bg-red-950 dark:hover:text-red-200"
+              className="rounded-full border border-line-strong px-3 py-1 text-xs font-medium text-muted transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-700 disabled:opacity-50 dark:hover:border-red-800 dark:hover:bg-red-950 dark:hover:text-red-200"
             >
               {section.label}
             </button>
@@ -88,7 +88,7 @@ export function DangerZone({ onCleared }) {
         </div>
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-3 border-t border-slate-200 pt-4 dark:border-slate-800">
+      <div className="mt-5 flex flex-wrap gap-3 border-t border-line pt-4">
         <Button
           variant="secondary"
           size="sm"

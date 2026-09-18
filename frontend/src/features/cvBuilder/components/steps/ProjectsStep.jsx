@@ -290,7 +290,7 @@ export function ProjectsStep() {
                 reordering={isReordering}
               >
                 {project.description ? (
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                  <p className="text-sm text-muted">
                     {project.description}
                   </p>
                 ) : null}

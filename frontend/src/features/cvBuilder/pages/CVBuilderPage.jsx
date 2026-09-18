@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { Alert, Button, Card, Spinner } from '@/components/ui';
+import { Alert, Button, Card, SkeletonRows, Spinner } from '@/components/ui';
 
 import { useCompletion, useCvProfile, useEnsureProfile, useTemplates } from '../api/cvQueries';
 import { CompletionBar } from '../components/CompletionBar';
@@ -158,63 +158,57 @@ export default function CVBuilderPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-              CV Builder
-            </h1>
-            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-              One master CV. HireFlow tailors it per application rather than storing many copies.
-            </p>
-          </div>
-          <div className="w-full max-w-sm">
-            <CompletionBar score={score} isComplete={isComplete} />
-            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-              Every section saves as soon as you add or edit an entry — there is no separate save
-              step outside Contact &amp; Summary.
-            </p>
-          </div>
+    <div className="mx-auto flex max-w-7xl flex-col gap-4">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">CV Builder</h1>
+          <p className="mt-0.5 text-xs text-muted">
+            One master CV. HireFlow tailors it per application rather than storing many copies.
+          </p>
         </div>
-      </Card>
+        <div className="w-full max-w-xs">
+          <CompletionBar score={score} isComplete={isComplete} />
+        </div>
+      </div>
 
       {isError ? (
-        <Alert variant="error">
-          Your CV could not be loaded. Refresh to try again.
-        </Alert>
+        <Alert variant="error">Your CV could not be loaded. Refresh to try again.</Alert>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[240px_minmax(0,1fr)_380px] 2xl:grid-cols-[260px_minmax(0,1fr)_460px]">
-        <Card className="h-fit lg:sticky lg:top-6">
-          {/* Repeated here because the header card scrolls out of view while
-              you work, and the score is the main feedback that a save landed. */}
-          <div className="mb-4 border-b border-slate-200 pb-4 dark:border-slate-800">
+      <div className="grid gap-4 lg:grid-cols-[218px_minmax(0,1fr)] xl:grid-cols-[218px_minmax(0,1fr)_360px] 2xl:grid-cols-[232px_minmax(0,1fr)_420px]">
+        <Card className="h-fit lg:sticky lg:top-4" padded={false}>
+          {/* Repeated here because the header scrolls out of view while you
+              work, and the score is the main feedback that a save landed. */}
+          <div className="border-b border-line p-3.5">
             <CompletionBar score={score} isComplete={isComplete} />
           </div>
-          <StepNavigator
-            activeStep={activeStep}
-            onStepChange={setActiveStep}
-            sectionCompletion={sectionCompletion}
-          />
+          <div className="p-2">
+            <StepNavigator
+              activeStep={activeStep}
+              onStepChange={setActiveStep}
+              sectionCompletion={sectionCompletion}
+            />
+          </div>
         </Card>
 
-        <div className="min-w-0 space-y-6">
-          {isLoading ? <Spinner className="py-20" /> : renderStep()}
+        <div className="flex min-w-0 flex-col gap-4">
+          {isLoading ? <SkeletonRows rows={4} /> : renderStep()}
 
           <div className="flex items-center justify-between gap-3">
             <Button
               variant="secondary"
+              icon="chevronLeft"
               disabled={!previousStep}
               onClick={() => previousStep && setActiveStep(previousStep.key)}
             >
-              ← {previousStep ? previousStep.label : 'Back'}
+              {previousStep ? previousStep.label : 'Back'}
             </Button>
             <Button
+              iconAfter="chevronRight"
               disabled={!nextStep}
               onClick={() => nextStep && setActiveStep(nextStep.key)}
             >
-              {nextStep ? nextStep.label : 'Done'} →
+              {nextStep ? nextStep.label : 'Done'}
             </Button>
           </div>
 
@@ -223,7 +217,7 @@ export default function CVBuilderPage() {
 
         {/* Mounted only above xl — see PREVIEW_PANE_QUERY. */}
         {hasPane ? (
-          <Card className="sticky top-6 flex max-h-[calc(100vh-3rem)] flex-col">
+          <Card className="sticky top-4 flex max-h-[calc(100vh-2rem)] flex-col" padded={false}>
             <PreviewPane
               preview={preview}
               template={selectedTemplate}
@@ -238,7 +232,7 @@ export default function CVBuilderPage() {
       {/* Sticky rather than a floating circle, so it never covers a form field.
           Negative margins cancel AppLayout's own padding on <main>. */}
       {!hasPane ? (
-        <div className="sticky bottom-0 z-30 -mx-4 -mb-4 border-t border-slate-200 bg-white/90 px-4 py-3 backdrop-blur md:-mx-6 md:-mb-6 md:px-6 dark:border-slate-800 dark:bg-slate-900/90">
+        <div className="sticky bottom-0 z-30 -mx-4 -mb-4 border-t border-line bg-surface/90 px-4 py-3 backdrop-blur md:-mx-6 md:-mb-6 md:px-6">
           <Button className="w-full" onClick={() => setSheetOpen(true)}>
             Preview CV
             {pageCount > 0 ? ` · ${pageCount} ${pageCount === 1 ? 'page' : 'pages'}` : ''}

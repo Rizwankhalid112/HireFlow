@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
 import { Button, FormField } from '@/components/ui';
-import { GoogleSignInButton } from '@/features/auth/components/GoogleSignInButton';
 import { useLogin } from '@/features/auth/api/authQueries';
+import { GoogleSignInButton } from '@/features/auth/components/GoogleSignInButton';
 import { loginSchema } from '@/features/auth/schemas/authSchemas';
 
 export function LoginForm() {
@@ -15,65 +15,67 @@ export function LoginForm() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
+    defaultValues: { email: '', password: '' },
   });
 
   return (
     <form
-      className="space-y-4"
+      className="flex flex-col gap-5"
       onSubmit={handleSubmit((values) => loginMutation.mutate(values))}
       noValidate
     >
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Welcome back</h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400">
-          Sign in to continue tracking your job search.
-        </p>
+      <header className="flex flex-col gap-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
+        <p className="text-[13px] text-muted">Sign in to pick up where you left off.</p>
+      </header>
+
+      <div className="flex flex-col gap-3.5">
+        <FormField
+          id="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@company.com"
+          error={errors.email}
+          registration={register('email')}
+        />
+
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <label htmlFor="password" className="text-xs font-medium text-ink">
+              Password
+            </label>
+            <Link to="/forgot-password" className="text-xs font-medium text-accent hover:underline">
+              Forgot?
+            </Link>
+          </div>
+          <FormField
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            placeholder="••••••••"
+            error={errors.password}
+            registration={register('password')}
+          />
+        </div>
+
+        <Button type="submit" size="lg" className="w-full" loading={loginMutation.isPending}>
+          Sign in
+        </Button>
       </div>
 
-      <FormField
-        id="email"
-        label="Email"
-        type="email"
-        autoComplete="email"
-        placeholder="you@example.com"
-        registration={register('email')}
-        error={errors.email}
-      />
-
-      <FormField
-        id="password"
-        label="Password"
-        type="password"
-        autoComplete="current-password"
-        placeholder="Enter your password"
-        registration={register('password')}
-        error={errors.password}
-      />
-
-      <div className="flex justify-end">
-        <Link to="/forgot-password" className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
-          Forgot password?
-        </Link>
-      </div>
-
-      <Button type="submit" className="w-full" loading={loginMutation.isPending}>
-        Sign in
-      </Button>
-
-      <div className="relative py-2 text-center text-xs uppercase tracking-wide text-slate-400">
-        <span className="bg-white px-2 dark:bg-slate-900">or</span>
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-line" />
+        <span className="text-[11px] text-subtle">OR</span>
+        <span className="h-px flex-1 bg-line" />
       </div>
 
       <GoogleSignInButton />
 
-      <p className="text-center text-sm text-slate-600 dark:text-slate-400">
-        Don&apos;t have an account?{' '}
-        <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-700">
-          Create one
+      <p className="text-center text-xs text-muted">
+        New here?{' '}
+        <Link to="/register" className="font-medium text-accent hover:underline">
+          Create an account
         </Link>
       </p>
     </form>

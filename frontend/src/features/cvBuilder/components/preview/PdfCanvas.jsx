@@ -101,7 +101,7 @@ export function PdfCanvas({ data, scale, onPageCount }) {
           canvas.style.width = `${viewport.width}px`;
           canvas.style.height = `${viewport.height}px`;
           canvas.className =
-            'mx-auto mb-4 rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700';
+            'mx-auto mb-4 rounded-lg border border-line bg-surface shadow-sm';
           canvas.setAttribute('aria-label', `CV page ${pageNumber}`);
 
           fragment.appendChild(canvas);
