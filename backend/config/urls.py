@@ -17,6 +17,7 @@ urlpatterns = [
     path('api/auth/', include(auth_urlpatterns)),
     path('api/users/', include(user_urlpatterns)),
     path('api/cv/', include('apps.cv_builder.urls')),
+    path('api/jobs/', include('apps.jobs.urls')),
 ]
 
 if settings.DEBUG:

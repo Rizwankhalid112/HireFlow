@@ -2,49 +2,45 @@ import { Badge } from '@/components/ui';
 
 import { COMPLETE_THRESHOLD } from '../constants';
 
-export function CompletionBar({ score = 0, isComplete = false }) {
-  const safeScore = Math.max(0, Math.min(100, Number(score) || 0));
-  const remaining = Math.max(0, COMPLETE_THRESHOLD - safeScore);
+export function CompletionBar({ score = 0, isComplete = false, compact = false }) {
+  const safe = Math.max(0, Math.min(100, Number(score) || 0));
+  const remaining = Math.max(0, COMPLETE_THRESHOLD - safe);
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-            CV completeness
-          </span>
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between gap-2">
+        <span className="truncate text-xs font-medium text-ink">Completeness</span>
+        <span className="flex shrink-0 items-center gap-1.5">
           {isComplete ? (
             <Badge variant="success">Complete</Badge>
           ) : (
             <Badge variant="warning">Draft</Badge>
           )}
-        </div>
-        <span className="text-sm font-semibold tabular-nums text-slate-900 dark:text-slate-100">
-          {safeScore}%
+          <span className="tabular text-[13px] font-semibold">{safe}%</span>
         </span>
       </div>
 
       <div
-        className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"
+        className="h-1.5 overflow-hidden rounded-full bg-surface-3"
         role="progressbar"
-        aria-valuenow={safeScore}
+        aria-valuenow={safe}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label="CV completeness"
       >
         <div
-          className={`h-full rounded-full transition-all duration-500 ${
-            isComplete ? 'bg-emerald-500' : 'bg-indigo-600'
-          }`}
-          style={{ width: `${safeScore}%` }}
+          className={`h-full rounded-full transition-[width] duration-500 ${isComplete ? 'bg-ok-solid' : 'bg-accent'}`}
+          style={{ width: `${safe}%` }}
         />
       </div>
 
-      <p className="text-xs text-slate-500 dark:text-slate-400">
-        {isComplete
-          ? 'Your CV is complete and safe from automatic draft cleanup.'
-          : `${remaining}% more to reach ${COMPLETE_THRESHOLD}% and mark this CV complete.`}
-      </p>
+      {!compact ? (
+        <p className="text-[11px] leading-4 text-subtle">
+          {isComplete
+            ? 'Complete, and safe from automatic draft cleanup.'
+            : `${remaining} points to reach ${COMPLETE_THRESHOLD}% — sections score all or nothing.`}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -1,0 +1,76 @@
+{% extends "cv_templates/base.html" %}
+{% comment %} Traditional serif, centred header. For conservative industries. {% endcomment %}
+
+{% block page_margin %}16mm 18mm{% endblock %}
+
+{% block styles %}
+  body { font-family: "DejaVu Serif", Georgia, "Times New Roman", serif; font-size: 10pt; }
+
+  header { text-align: center; border-bottom: 1.2pt solid #1e293b; padding-bottom: 8pt; }
+  .name { font-size: 20pt; letter-spacing: 1pt; text-transform: uppercase; }
+  .title { font-size: 10.5pt; font-style: italic; color: #475569; margin-top: 3pt; }
+  .contact { margin-top: 5pt; font-size: 9pt; color: #475569; }
+  .contact span:not(:last-child)::after { content: "  |  "; }
+
+  .section { margin-top: 14pt; }
+  .section-title {
+    font-size: 10pt;
+    text-transform: uppercase;
+    letter-spacing: 1.5pt;
+    text-align: center;
+    border-bottom: 0.5pt solid #cbd5e1;
+    padding-bottom: 3pt;
+    margin-bottom: 8pt;
+  }
+
+  .entry { margin-bottom: 10pt; }
+  .entry-head { display: flex; justify-content: space-between; gap: 10pt; }
+  .entry-title { font-size: 10.5pt; }
+  .entry-sub { font-size: 9.5pt; font-style: italic; color: #475569; }
+  .entry-date { font-size: 9pt; color: #64748b; white-space: nowrap; }
+
+  .bullets { margin-top: 3pt; }
+  .bullets li { padding-left: 12pt; position: relative; margin-bottom: 2pt; }
+  .bullets li::before { content: "—"; position: absolute; left: 0; color: #94a3b8; }
+
+  .summary p { text-align: justify; }
+  .inline-list { font-size: 9.5pt; }
+  .tech { margin-top: 2pt; font-size: 8.5pt; font-style: italic; color: #64748b; }
+  .meta-list li { margin-bottom: 3pt; }
+{% endblock %}
+
+{% block body %}
+  <header>
+    <h1 class="name">{{ full_name }}</h1>
+    {% if professional_title %}<div class="title">{{ professional_title }}</div>{% endif %}
+    <div class="contact">
+      {% for line in contact_lines %}<span>{{ line }}</span>{% endfor %}
+      {% for link in links %}<span>{{ link.url }}</span>{% endfor %}
+    </div>
+  </header>
+
+  {% if summary %}
+    <div class="section summary">
+      <div class="section-title">Profile</div>
+      <p>{{ summary }}</p>
+    </div>
+  {% endif %}
+
+  {% include "cv_templates/_sections.html" %}
+
+  {% if skills %}
+    <div class="section">
+      <div class="section-title">Skills</div>
+      <div class="inline-list">{{ skills|join:"  ·  " }}</div>
+    </div>
+  {% endif %}
+
+  {% if languages %}
+    <div class="section">
+      <div class="section-title">Languages</div>
+      <div class="inline-list">
+        {% for language in languages %}{{ language.name }}{% if language.proficiency %} ({{ language.proficiency }}){% endif %}{% if not forloop.last %}  ·  {% endif %}{% endfor %}
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,5 +1,10 @@
 /* Option values must match the TextChoices in backend/apps/cv_builder/models/. */
 
+/* Mirrors DEFAULT_TEMPLATE_ID in backend/apps/cv_builder/templates_registry.py.
+   The backend now defaults the column, so this is only the gap before the
+   profile query resolves. */
+export const DEFAULT_TEMPLATE_ID = 'minimal';
+
 export const EMPLOYMENT_TYPES = [
   { value: 'full_time', label: 'Full-time' },
   { value: 'part_time', label: 'Part-time' },
@@ -78,13 +83,59 @@ export const SUMMARY_MIN_LENGTH = 80;
 export const SKILLS_MIN_COUNT = 5;
 export const MAX_TECH_STACK = 10;
 
+/* `points` and `requirement` mirror services/completion.py. They are shown in the
+   step navigator because the all-or-nothing thresholds (2+ bullets, 5 skills)
+   otherwise look like the score has stalled for no reason. */
 export const STEPS = [
-  { key: 'contact', label: 'Contact & Summary', sections: ['contact', 'summary'] },
-  { key: 'experience', label: 'Work Experience', sections: ['experience'] },
-  { key: 'education', label: 'Education', sections: ['education'] },
-  { key: 'skills', label: 'Skills', sections: ['skills'] },
-  { key: 'projects', label: 'Projects', sections: ['projects'] },
-  { key: 'extras', label: 'Certifications & Languages', sections: [] },
+  {
+    key: 'template',
+    label: 'CV Templates',
+    sections: [],
+    points: 0,
+    requirement: 'Browse 6 layouts and pick one',
+  },
+  {
+    key: 'contact',
+    label: 'Contact & Summary',
+    sections: ['contact', 'summary'],
+    points: 35,
+    requirement: 'Name, email, phone, city (25) + an 80-character summary (10)',
+  },
+  {
+    key: 'experience',
+    label: 'Work Experience',
+    sections: ['experience'],
+    points: 25,
+    requirement: 'At least one role with 2 or more bullets',
+  },
+  {
+    key: 'education',
+    label: 'Education',
+    sections: ['education'],
+    points: 15,
+    requirement: 'At least one entry',
+  },
+  {
+    key: 'skills',
+    label: 'Skills',
+    sections: ['skills'],
+    points: 15,
+    requirement: 'At least 5 skills',
+  },
+  {
+    key: 'projects',
+    label: 'Projects',
+    sections: ['projects'],
+    points: 10,
+    requirement: 'At least one project',
+  },
+  {
+    key: 'extras',
+    label: 'Certifications & Languages',
+    sections: [],
+    points: 0,
+    requirement: 'Optional — does not affect your score',
+  },
 ];
 
 export function monthLabel(value) {

@@ -1,18 +1,17 @@
+import { Icon } from './Icon';
+
 const variants = {
-  primary:
-    'bg-[rgb(var(--color-primary))] text-white hover:bg-[rgb(var(--color-primary-hover))] focus-visible:ring-indigo-500',
-  secondary:
-    'bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 focus-visible:ring-slate-400 dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-800',
-  ghost:
-    'bg-transparent text-slate-700 hover:bg-slate-100 focus-visible:ring-slate-400 dark:text-slate-200 dark:hover:bg-slate-800',
-  danger:
-    'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500',
+  primary: 'bg-accent text-accent-on hover:bg-accent-hover shadow-card',
+  secondary: 'bg-surface text-ink border border-line-strong hover:bg-surface-2',
+  ghost: 'text-muted hover:bg-surface-3 hover:text-ink',
+  danger: 'bg-bad-solid text-white hover:brightness-110',
+  quiet: 'text-accent hover:bg-accent-soft',
 };
 
 const sizes = {
-  sm: 'h-9 px-3 text-sm',
-  md: 'h-11 px-4 text-sm',
-  lg: 'h-12 px-6 text-base',
+  sm: 'h-7 px-2.5 text-xs gap-1.5',
+  md: 'h-8 px-3.5 text-[13px] gap-2',
+  lg: 'h-10 px-5 text-sm gap-2',
 };
 
 export function Button({
@@ -20,6 +19,8 @@ export function Button({
   className = '',
   variant = 'primary',
   size = 'md',
+  icon,
+  iconAfter,
   loading = false,
   disabled,
   type = 'button',
@@ -29,11 +30,41 @@ export function Button({
     <button
       type={type}
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center rounded-control font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
-      {loading ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent" /> : null}
+      {loading ? (
+        <span className="size-3.5 animate-spin rounded-full border-2 border-current border-r-transparent" />
+      ) : (
+        icon && <Icon name={icon} size={size === 'lg' ? 16 : 14} />
+      )}
       {children}
+      {iconAfter && !loading && <Icon name={iconAfter} size={size === 'lg' ? 16 : 14} />}
+    </button>
+  );
+}
+
+/* A square button whose only content is an icon. `label` is required — it is
+   the control's entire accessible name. */
+export function IconButton({
+  icon,
+  label,
+  size = 'md',
+  variant = 'ghost',
+  className = '',
+  ...props
+}) {
+  const box = size === 'sm' ? 'size-7' : 'size-8';
+
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      className={`inline-flex items-center justify-center rounded-control transition-colors disabled:pointer-events-none disabled:opacity-40 ${variants[variant]} ${box} ${className}`}
+      {...props}
+    >
+      <Icon name={icon} size={15} />
     </button>
   );
 }

@@ -1,22 +1,169 @@
 @import 'tailwindcss';
 
-/* Tailwind v4 defaults `dark:` to prefers-color-scheme. ThemeContext toggles a
+/* Tailwind v4 points `dark:` at prefers-color-scheme. ThemeContext toggles a
    `.dark` class on <html>, so the variant has to be redefined to follow it. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-:root {
-  --color-primary: 79 70 229;
-  --color-primary-hover: 67 56 202;
+/* ───────────────────────────────────────────────────────────────────────────
+   Two layers, and the split is the whole point.
+
+   BRAND is blue. It carries identity and "act here", and nothing else.
+   SEMANTIC is green / amber / red, and each already means something specific
+   in this product: evidenced, ask-first, missing. Those meanings are a
+   contract with the user — the brand may change, they may not.
+
+   Both layers are declared as themeable custom properties below and exposed to
+   Tailwind through `@theme inline`, so `bg-surface` or `text-ok` resolves
+   correctly in either theme and components carry no `dark:` variants.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+@layer base {
+  :root {
+    /* surfaces */
+    --canvas: #f7f8fa;
+    --surface: #ffffff;
+    --surface-2: #fafbfc;
+    --surface-3: #eef1f5;
+    --line: #e2e8f0;
+    --line-strong: #cbd5e1;
+
+    /* text */
+    --text: #0b1220;
+    --text-muted: #475569;
+    --text-subtle: #94a3b8;
+
+    /* brand */
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-soft: #eff6ff;
+    --accent-line: #bfdbfe;
+    --accent-on: #ffffff;
+
+    /* semantic — evidenced */
+    --ok: #047857;
+    --ok-solid: #059669;
+    --ok-soft: #ecfdf5;
+    --ok-line: #a7f3d0;
+
+    /* semantic — ask first */
+    --warn: #b45309;
+    --warn-solid: #d97706;
+    --warn-soft: #fffbeb;
+    --warn-line: #fde68a;
+
+    /* semantic — missing / destructive */
+    --bad: #b91c1c;
+    --bad-solid: #dc2626;
+    --bad-soft: #fef2f2;
+    --bad-line: #fecaca;
+  }
+
+  .dark {
+    --canvas: #0a0d14;
+    --surface: #12161f;
+    --surface-2: #171c27;
+    --surface-3: #1d2330;
+    --line: #222937;
+    --line-strong: #2e3748;
+
+    --text: #e8ebf0;
+    --text-muted: #9aa6b8;
+    --text-subtle: #66738a;
+
+    --accent: #60a5fa;
+    --accent-hover: #93c5fd;
+    --accent-soft: #0e1a2e;
+    --accent-line: #1e3a5f;
+    --accent-on: #0a0d14;
+
+    --ok: #34d399;
+    --ok-solid: #059669;
+    --ok-soft: #0b1f1a;
+    --ok-line: #14532d;
+
+    --warn: #fbbf24;
+    --warn-solid: #d97706;
+    --warn-soft: #221806;
+    --warn-line: #78350f;
+
+    --bad: #f87171;
+    --bad-solid: #dc2626;
+    --bad-soft: #241010;
+    --bad-line: #7f1d1d;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
+/* `inline` emits `var(--x)` into the utility instead of resolving it at build
+   time — which is what lets one class follow the theme. */
+@theme inline {
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-ink: var(--text);
+  --color-muted: var(--text-muted);
+  --color-subtle: var(--text-subtle);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-line: var(--accent-line);
+  --color-accent-on: var(--accent-on);
+
+  --color-ok: var(--ok);
+  --color-ok-solid: var(--ok-solid);
+  --color-ok-soft: var(--ok-soft);
+  --color-ok-line: var(--ok-line);
+
+  --color-warn: var(--warn);
+  --color-warn-solid: var(--warn-solid);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-line: var(--warn-line);
+
+  --color-bad: var(--bad);
+  --color-bad-solid: var(--bad-solid);
+  --color-bad-soft: var(--bad-soft);
+  --color-bad-line: var(--bad-line);
+
+  /* One radius per role. The app previously mixed lg / xl / 2xl on sibling
+     surfaces, which is most of why it read as unfinished. */
+  --radius-control: 7px;
+  --radius-card: 10px;
+
+  --shadow-card: 0 1px 2px rgb(11 18 32 / 0.04);
+  --shadow-pop: 0 6px 20px rgb(11 18 32 / 0.12);
 }
 
-body {
-  @apply bg-slate-50 text-slate-900 antialiased;
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 
-.dark body {
-  @apply bg-slate-950 text-slate-100;
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+    /* Compact density: 13px base, so a list of jobs shows ~7 per screen. */
+    font-size: 13px;
+  }
+
+  /* Every figure in this product is a count, a score or an allowance that
+     updates in place. Tabular numerals stop them jittering on refetch. */
+  .tabular {
+    @apply font-mono tabular-nums;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 }

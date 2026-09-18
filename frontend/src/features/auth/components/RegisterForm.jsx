@@ -29,8 +29,8 @@ export function RegisterForm() {
       noValidate
     >
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Create account</h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400">
+        <h1 className="text-2xl font-semibold text-ink">Create account</h1>
+        <p className="text-sm text-muted">
           Start organizing your job search in minutes.
         </p>
       </div>
@@ -78,9 +78,9 @@ export function RegisterForm() {
         Create account
       </Button>
 
-      <p className="text-center text-sm text-slate-600 dark:text-slate-400">
+      <p className="text-center text-sm text-muted">
         Already have an account?{' '}
-        <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-700">
+        <Link to="/login" className="font-medium text-accent hover:text-accent">
           Sign in
         </Link>
       </p>

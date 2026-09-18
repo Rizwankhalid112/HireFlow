@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 
 from apps.accounts.models import User
+from apps.cv_builder.templates_registry import DEFAULT_TEMPLATE_ID, template_choices
 
 
 class CVProfile(models.Model):
@@ -22,7 +23,16 @@ class CVProfile(models.Model):
     github_url = models.URLField(blank=True, default='')
     portfolio_url = models.URLField(blank=True, default='')
     summary = models.TextField(blank=True, default='')
-    template_id = models.CharField(max_length=50, null=True, blank=True)
+    # Defaulted rather than nullable: the live preview always has a template to
+    # render, so "no template chosen yet" is not a state anything downstream
+    # handles — the picker would show nothing selected and the renderer would
+    # silently fall back.
+    template_id = models.CharField(
+        max_length=50,
+        default=DEFAULT_TEMPLATE_ID,
+        choices=template_choices(),
+    )
+    photo = models.ImageField(upload_to='cv_photos/%Y/%m/', null=True, blank=True)
     is_complete = models.BooleanField(default=False)
     completion_score = models.IntegerField(default=0)
     content_updated_at = models.DateTimeField(auto_now=True)

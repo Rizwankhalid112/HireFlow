@@ -57,6 +57,11 @@ services:
       dockerfile: Dockerfile
     command: celery -A celery_app worker -l info
     env_file: .env
+    # The worker reads files the web container wrote: extract_text_from_cv opens
+    # the uploaded CV from MEDIA_ROOT. Without this mount its /app/media is an
+    # empty directory and every upload fails with "could not read that file".
+    volumes:
+      - media_volume:/app/media
     depends_on:
       db:
         condition: service_healthy
@@ -72,6 +77,11 @@ services:
       dockerfile: Dockerfile
     command: celery -A celery_app beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     env_file: .env
+    # beat itself schedules rather than executes, but delete_stale_drafts and
+    # delete_orphaned_files unlink real files when they run, so it needs the
+    # same view of media as the worker.
+    volumes:
+      - media_volume:/app/media
     depends_on:
       db:
         condition: service_healthy

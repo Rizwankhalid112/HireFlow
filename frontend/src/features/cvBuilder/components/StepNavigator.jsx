@@ -1,31 +1,11 @@
+import { Icon } from '@/components/ui';
+
 import { STEPS } from '../constants';
 
-function StepDot({ state }) {
-  if (state === 'done') {
-    return (
-      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[11px] font-bold text-white">
-        ✓
-      </span>
-    );
-  }
-
-  return (
-    <span
-      className={`h-5 w-5 shrink-0 rounded-full border-2 ${
-        state === 'partial'
-          ? 'border-amber-400 bg-amber-100 dark:bg-amber-950'
-          : 'border-slate-300 dark:border-slate-600'
-      }`}
-    />
-  );
-}
-
-/* `sectionCompletion` is the backend's section_completion dict, so the dots
+/* `sectionCompletion` is the backend's section_completion dict, so the marks
    always reflect server-side scoring rather than a local guess. */
 function stepState(step, sectionCompletion) {
-  if (!step.sections.length) {
-    return 'optional';
-  }
+  if (!step.sections.length) return 'optional';
 
   const flags = step.sections.map((section) => Boolean(sectionCompletion?.[section]));
   if (flags.every(Boolean)) return 'done';
@@ -33,9 +13,27 @@ function stepState(step, sectionCompletion) {
   return 'todo';
 }
 
+function StepMark({ state }) {
+  if (state === 'done') {
+    return (
+      <span className="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-ok-solid text-white">
+        <Icon name="check" size={9} strokeWidth={3.6} />
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={`mt-0.5 size-4 shrink-0 rounded-full border-2 ${
+        state === 'partial' ? 'border-warn-solid bg-warn-soft' : 'border-line-strong'
+      }`}
+    />
+  );
+}
+
 export function StepNavigator({ activeStep, onStepChange, sectionCompletion }) {
   return (
-    <nav aria-label="CV sections" className="space-y-1">
+    <nav aria-label="CV sections" className="flex flex-col gap-0.5">
       {STEPS.map((step) => {
         const isActive = step.key === activeStep;
         const state = stepState(step, sectionCompletion);
@@ -46,14 +44,38 @@ export function StepNavigator({ activeStep, onStepChange, sectionCompletion }) {
             type="button"
             onClick={() => onStepChange(step.key)}
             aria-current={isActive ? 'step' : undefined}
-            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
-              isActive
-                ? 'bg-indigo-50 text-indigo-700 dark:bg-slate-800 dark:text-indigo-300'
-                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+            className={`flex w-full items-start gap-2.5 rounded-control px-2 py-1.5 text-left transition-colors ${
+              isActive ? 'bg-accent-soft' : 'hover:bg-surface-3'
             }`}
           >
-            <StepDot state={state} />
-            <span className="flex-1">{step.label}</span>
+            <StepMark state={state} />
+
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center justify-between gap-2">
+                <span
+                  className={`text-[13px] ${isActive ? 'font-semibold text-accent' : 'font-medium text-ink'}`}
+                >
+                  {step.label}
+                </span>
+                {step.points ? (
+                  <span
+                    className={`tabular shrink-0 text-[11px] ${
+                      state === 'done' ? 'text-ok' : state === 'partial' ? 'text-warn' : 'text-subtle'
+                    }`}
+                  >
+                    {state === 'done' ? `+${step.points}` : step.points}
+                  </span>
+                ) : null}
+              </span>
+
+              {/* Explains an apparently stalled score: these thresholds are
+                  all-or-nothing, so a half-filled section scores zero. */}
+              {state !== 'done' && step.requirement ? (
+                <span className="mt-0.5 block text-[11px] leading-4 font-normal text-subtle">
+                  {step.requirement}
+                </span>
+              ) : null}
+            </span>
           </button>
         );
       })}
