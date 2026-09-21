@@ -25,7 +25,10 @@ python manage.py migrate --noinput
 # and "already exists" on every run after the first.
 python manage.py createcachetable 2>/dev/null || true
 
-if [ "${COLLECT_STATIC:-false}" = "true" ]; then
+# The image tries collectstatic at build time, but manage.py needs SECRET_KEY
+# and a build has no environment — so on a platform it fails there and the
+# admin ends up with no CSS. Re-run whenever the directory is missing.
+if [ "${COLLECT_STATIC:-false}" = "true" ] || [ ! -d /app/staticfiles ]; then
   echo "Collecting static files..."
   python manage.py collectstatic --noinput
 fi

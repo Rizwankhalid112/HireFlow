@@ -10,21 +10,36 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { queryClient } from '@/lib/queryClient';
 
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+/* Baked in at build time, so it is either present in this bundle or it never
+   will be. Exported because the sign-in button uses the same answer to decide
+   whether to render at all. */
+export const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+export const googleEnabled = Boolean(googleClientId);
+
+/* Mounting GoogleOAuthProvider with an empty clientId loads Google's script
+   and lets it fail inside its own minified code the moment anything calls
+   useGoogleLogin — which took down the whole login page, the one route that
+   renders the button. Social sign-in is optional; a missing client id should
+   remove the button, not the page. */
+function WithGoogle({ children }) {
+  if (!googleEnabled) return children;
+
+  return <GoogleOAuthProvider clientId={googleClientId}>{children}</GoogleOAuthProvider>;
+}
 
 export function Providers() {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
-          <GoogleOAuthProvider clientId={googleClientId}>
+          <WithGoogle>
             <BrowserRouter>
               <ErrorBoundary>
                 <AppRouter />
               </ErrorBoundary>
               <Toaster position="top-right" richColors closeButton />
             </BrowserRouter>
-          </GoogleOAuthProvider>
+          </WithGoogle>
         </ThemeProvider>
       </QueryClientProvider>
     </Provider>

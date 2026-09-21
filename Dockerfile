@@ -18,9 +18,19 @@ COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm install
 
 COPY frontend/ ./
-# VITE_API_URL is deliberately not passed. The client falls back to a relative
-# /api, which is correct here because Django serves the bundle and the API from
-# the same origin — and it means this image works on any domain unrebuilt.
+
+# Vite inlines env at build time, so anything the browser needs must be here
+# rather than in the runtime environment.
+#
+# VITE_API_URL is deliberately absent: the client falls back to a relative
+# /api, which is right because Django serves the bundle and the API from one
+# origin, and it means this image runs on any domain unrebuilt.
+#
+# The Google client id is a public identifier, not a secret. Leave it unset and
+# social sign-in simply does not appear; the rest of auth is unaffected.
+ARG VITE_GOOGLE_CLIENT_ID=""
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+
 RUN npm run build
 
 # ── 2. the application ──────────────────────────────────────────────────────
