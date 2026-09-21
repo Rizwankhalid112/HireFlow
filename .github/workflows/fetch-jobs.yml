@@ -41,15 +41,12 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements.txt
 
-      - name: Install Pango and friends
-        # WeasyPrint is in requirements and loads shared libraries on import.
-        # The gather never renders a PDF, but Django imports the whole app.
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libffi8 \
-            libjpeg62-turbo fontconfig fonts-dejavu-core
-
+      # No system libraries are installed on purpose. WeasyPrint needs Pango
+      # at *render* time, but it is imported inside the functions that render,
+      # so a management command never loads it. The apt step this replaces
+      # failed anyway: it used Debian package names from the Dockerfile
+      # (libjpeg62-turbo) and GitHub's runners are Ubuntu, where that package
+      # does not exist — apt exits 100 and takes the workflow with it.
       - name: Install dependencies
         working-directory: backend
         run: |
