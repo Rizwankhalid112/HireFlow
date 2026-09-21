@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
 
@@ -44,7 +45,10 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(AuthMessages.INVALID_CREDENTIALS)
         if not user.is_active:
             raise serializers.ValidationError(AuthMessages.ACCOUNT_DISABLED)
-        if not user.is_email_verified:
+        # Gated by a setting so a deployment that cannot send mail is not a
+        # deployment nobody can log into. Default stays on: verification is
+        # the right behaviour once mail works.
+        if settings.REQUIRE_EMAIL_VERIFICATION and not user.is_email_verified:
             raise serializers.ValidationError(AuthMessages.EMAIL_NOT_VERIFIED)
         attrs['user'] = user
         return attrs

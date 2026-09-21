@@ -324,6 +324,17 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 # Ten seconds is longer than any healthy SMTP handshake and short enough that
 # the user gets their account either way.
 EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=10, cast=int)
+
+# Whether login requires a verified address.
+#
+# Turn this off only where mail genuinely cannot be delivered — a host that
+# blocks outbound SMTP, for instance. It is a real reduction in security:
+# anyone can register with an address they do not own, so do not leave it off
+# once mail works.
+#
+# Registration still sends the mail and the verification link still works;
+# this only stops an unverified account being refused at the door.
+REQUIRE_EMAIL_VERIFICATION = config('REQUIRE_EMAIL_VERIFICATION', default=True, cast=bool)
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@hireflow.com')
 
 
