@@ -15,6 +15,7 @@ This is the repo's first test suite, so three things here are load-bearing:
 import re
 
 import pytest
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from rest_framework.test import APIClient
@@ -40,20 +41,31 @@ def pytest_configure(config):
     hard-coding the Compose hostname, so the suite also runs against a Redis
     reachable some other way. A non-Redis cache is left alone.
     """
-    from django.conf import settings
-
-    cache = settings.CACHES['default']
-    if 'redis' in cache['BACKEND'].lower():
-        location = re.sub(r'/\d+$', '', cache.get('LOCATION', '') or '')
-        cache['LOCATION'] = f'{location}/3'
+    config_entry = settings.CACHES['default']
+    if 'redis' in config_entry['BACKEND'].lower():
+        location = re.sub(r'/\d+$', '', config_entry.get('LOCATION', '') or '')
+        config_entry['LOCATION'] = f'{location}/3'
 
 
 @pytest.fixture(autouse=True)
-def _clear_cache():
+def _clear_cache(request):
     """Every test starts with an empty cache, on both sides of the test.
 
     Clearing afterwards too keeps a failure from poisoning the next test.
+
+    The suite is built around Redis, where clearing the cache touches no
+    database. A deploy with no Redis uses the database-backed cache instead,
+    and there every cache call — including this one, and any the code under
+    test makes — is a query that pytest-django blocks unless the test asked
+    for the database.
+
+    So when that backend is in play, grant the database to everything. It
+    costs a transaction per test in a configuration that is not the default,
+    and it is the difference between the suite running under it and not.
     """
+    if 'db.DatabaseCache' in settings.CACHES['default']['BACKEND']:
+        request.getfixturevalue('db')
+
     cache.clear()
     yield
     cache.clear()

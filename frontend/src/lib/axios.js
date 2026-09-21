@@ -3,7 +3,12 @@ import axios from 'axios';
 import { logout, setCredentials } from '@/store/slices/authSlice';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost/api',
+  /* Relative on purpose. The API is always same-origin — behind nginx in
+     Compose, served by Django itself in a single-service deploy — so a
+     relative base makes one build work on localhost, staging and production
+     with no rebuild. An absolute URL baked in at build time was pointing
+     deployed bundles back at localhost. */
+  baseURL: import.meta.env.VITE_API_URL || '/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',

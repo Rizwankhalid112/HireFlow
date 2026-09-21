@@ -30,3 +30,6 @@ pypdfium2==5.13.0
 # Tests
 pytest==8.3.4
 pytest-django==4.9.0
+
+# Accepts a platform-provided DATABASE_URL alongside the DB_* vars.
+dj-database-url==2.3.0
