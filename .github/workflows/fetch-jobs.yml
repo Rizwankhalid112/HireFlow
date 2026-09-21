@@ -1,0 +1,72 @@
+# Nightly job gather, run from CI.
+#
+# Celery Beat normally owns this, but a single-service free plan has no worker
+# and no beat process. Rather than add a trigger endpoint to the app — a new
+# public attack surface guarded by a shared secret — this runs the existing
+# management command from GitHub's runner against the hosted database. No
+# application change, no new route, and the command is the same one Beat calls.
+#
+# Requires one repository secret:
+#   DATABASE_URL   the platform's Postgres connection string
+#
+# Set it at: Settings → Secrets and variables → Actions → New repository secret.
+# Never commit the value.
+
+name: Fetch jobs
+
+on:
+  schedule:
+    # 03:00 UTC daily, matching the Beat schedule this replaces. GitHub runs
+    # scheduled jobs late under load, which is fine — the gather is idempotent
+    # and upserts on (source, external_id).
+    - cron: '0 3 * * *'
+  workflow_dispatch: # so you can run it by hand the first time
+
+concurrency:
+  # Two gathers at once would fight over the same rows to no benefit.
+  group: fetch-jobs
+  cancel-in-progress: false
+
+jobs:
+  gather:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install Pango and friends
+        # WeasyPrint is in requirements and loads shared libraries on import.
+        # The gather never renders a PDF, but Django imports the whole app.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libffi8 \
+            libjpeg62-turbo fontconfig fonts-dejavu-core
+
+      - name: Install dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Gather
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # The gather writes to the database and calls four public ATS APIs.
+          # It needs nothing else: no Redis, no AI key, no mail server. A
+          # throwaway SECRET_KEY is enough to let Django start, because no
+          # request is ever signed here.
+          SECRET_KEY: ci-only-not-used-for-signing
+          DEBUG: 'False'
+          ALLOWED_HOSTS: localhost
+          CACHE_URL: database
+          CELERY_TASK_ALWAYS_EAGER: 'True'
+        run: python manage.py fetch_jobs
