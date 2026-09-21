@@ -314,6 +314,16 @@ EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+
+# Django defaults this to None, which means an unreachable mail server is
+# waited on forever. Because there is no worker, the send happens inside the
+# request — so "forever" becomes gunicorn's worker timeout, and registration
+# returns 500 instead of 201. A host that silently drops outbound SMTP (common
+# on free plans) hits exactly that path.
+#
+# Ten seconds is longer than any healthy SMTP handshake and short enough that
+# the user gets their account either way.
+EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=10, cast=int)
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@hireflow.com')
 
 
