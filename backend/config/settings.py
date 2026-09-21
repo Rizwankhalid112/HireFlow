@@ -310,10 +310,12 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@hireflow.com'
 # Without this, django.core.cache falls back to per-process LocMemCache, so the
 # rendered-PDF cache would miss on every other gunicorn worker (and the
 # canonical-skill cache would never invalidate).
-# Compose keeps its Redis by default. A single-service deploy with no Redis
-# sets CACHE_URL=database to opt out explicitly — rather than the absence of a
-# variable quietly changing which backend the app uses.
-_CACHE_URL = config('CACHE_URL', default='redis://redis:6379/2')
+# The default is the shape that works with nothing configured. `redis:6379` is
+# a Compose hostname and resolves nowhere else, so defaulting to it meant a
+# deploy that forgot one variable died at boot with a DNS error that named
+# neither the variable nor the cause. docker-compose.yml now states its own
+# Redis explicitly; everywhere else degrades to a table.
+_CACHE_URL = config('CACHE_URL', default='database')
 
 if _CACHE_URL and _CACHE_URL != 'database':
     CACHES = {
@@ -337,15 +339,17 @@ else:
         }
     }
 
-CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://redis:6379/0')
-CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://redis:6379/1')
+# Same reasoning as the cache: no broker configured means there is no worker,
+# so queueing a task would drop it silently. The first casualty is the
+# verification email, and nobody can finish registering. Running tasks inline
+# is correct but slower — the register and CV-upload requests do the work
+# themselves. Compose sets a broker and gets the real queue back.
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='')
 
-# On a plan with no worker process a queued task would never run, and the first
-# thing that breaks is the verification email — which means nobody can finish
-# registering. Eager mode runs tasks inline instead: correct, but the register
-# and CV-upload requests then do that work themselves and take longer.
-# Opt in deliberately; the default keeps the real queue.
-CELERY_TASK_ALWAYS_EAGER = config('CELERY_TASK_ALWAYS_EAGER', default=False, cast=bool)
+CELERY_TASK_ALWAYS_EAGER = config(
+    'CELERY_TASK_ALWAYS_EAGER', default=not CELERY_BROKER_URL, cast=bool,
+)
 CELERY_TASK_EAGER_PROPAGATES = False
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'

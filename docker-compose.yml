@@ -33,6 +33,10 @@ services:
     env_file: .env
     environment:
       COLLECT_STATIC: "true"
+      # See the note on celery_worker: Compose is where the Redis actually is.
+      CACHE_URL: redis://redis:6379/2
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
     depends_on:
       db:
         condition: service_healthy
@@ -56,6 +60,15 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     command: celery -A celery_app worker -l info
+    environment:
+      # Stated here rather than relied on as a default: the settings module now
+      # defaults to the single-service shape (database cache, no broker), so a
+      # deploy that configures nothing still boots. Compose is the place that
+      # actually has a Redis, so Compose is the place that says so.
+      CACHE_URL: redis://redis:6379/2
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      RUN_SEEDS: "false"
     env_file: .env
     # The worker reads files the web container wrote: extract_text_from_cv opens
     # the uploaded CV from MEDIA_ROOT. Without this mount its /app/media is an
@@ -76,6 +89,12 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     command: celery -A celery_app beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    environment:
+      # As celery_worker.
+      CACHE_URL: redis://redis:6379/2
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      RUN_SEEDS: "false"
     env_file: .env
     # beat itself schedules rather than executes, but delete_stale_drafts and
     # delete_orphaned_files unlink real files when they run, so it needs the
