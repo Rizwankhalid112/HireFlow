@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
+import { googleEnabled } from '@/app/providers';
 import { Button, FormField } from '@/components/ui';
 import { useLogin } from '@/features/auth/api/authQueries';
 import { GoogleSignInButton } from '@/features/auth/components/GoogleSignInButton';
@@ -64,13 +65,19 @@ export function LoginForm() {
         </Button>
       </div>
 
-      <div className="flex items-center gap-3">
-        <span className="h-px flex-1 bg-line" />
-        <span className="text-[11px] text-subtle">OR</span>
-        <span className="h-px flex-1 bg-line" />
-      </div>
+      {/* Both hidden together when no Google client id was built in, or the
+          divider is left pointing at nothing. */}
+      {googleEnabled ? (
+        <>
+          <div className="flex items-center gap-3">
+            <span className="h-px flex-1 bg-line" />
+            <span className="text-[11px] text-subtle">OR</span>
+            <span className="h-px flex-1 bg-line" />
+          </div>
 
-      <GoogleSignInButton />
+          <GoogleSignInButton />
+        </>
+      ) : null}
 
       <p className="text-center text-xs text-muted">
         New here?{' '}
