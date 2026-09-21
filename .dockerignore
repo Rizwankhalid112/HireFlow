@@ -1,0 +1,55 @@
+# Build context for the root Dockerfile (the single-service deploy image).
+#
+# This file is load-bearing for secrets. `backend/.dockerignore` only applies
+# when the build context is `backend/`, which is how Compose builds — the root
+# image would otherwise copy `backend/.env` straight into the layer, where it
+# both leaks real credentials and silently overrides the platform's own
+# environment variables at runtime.
+
+# ── secrets: never, under any name ──────────────────────────────────────────
+.env
+*.env
+**/.env
+**/*.env
+!.env.example
+
+# ── local environments (huge, and wrong architecture anyway) ────────────────
+venv/
+.venv/
+**/venv/
+**/.venv/
+node_modules/
+**/node_modules/
+
+# ── build output: the image builds its own ──────────────────────────────────
+frontend/dist/
+**/dist/
+.vite/
+**/.vite/
+backend/staticfiles/
+backend/media/
+backend/frontend_dist/
+
+# ── caches and cruft ────────────────────────────────────────────────────────
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+**/.pytest_cache/
+*.log
+db.sqlite3
+.DS_Store
+*.swp
+
+# ── vcs, ci, editors ────────────────────────────────────────────────────────
+.git/
+.gitignore
+.github/
+.vscode/
+.idea/
+
+# ── docs and local-only compose ─────────────────────────────────────────────
+docs/
+*.md
+docker-compose*.yml
+nginx/

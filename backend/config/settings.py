@@ -1,6 +1,8 @@
+import re
 from datetime import timedelta
 from pathlib import Path
 
+import dj_database_url
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -76,16 +78,33 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='db'),
-        'PORT': config('DB_PORT', default='5432'),
+# Managed platforms hand out a single DATABASE_URL; Docker Compose sets the
+# five DB_* vars. Accept either, so the same image runs in both places.
+#
+# CONN_MAX_AGE is not cosmetic on hosted Postgres: connecting costs real
+# latency per request, and reusing the connection removes it from every call.
+_DATABASE_URL = config('DATABASE_URL', default='')
+
+if _DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(
+            _DATABASE_URL,
+            conn_max_age=config('CONN_MAX_AGE', default=600, cast=int),
+            ssl_require=config('DB_SSL_REQUIRE', default=not DEBUG, cast=bool),
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST', default='db'),
+            'PORT': config('DB_PORT', default='5432'),
+            'CONN_MAX_AGE': config('CONN_MAX_AGE', default=600, cast=int),
+        }
+    }
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -108,6 +127,36 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Option A (single service): the React build is copied into the image and
+# served by WhiteNoise at the root, so /assets/*.js and /favicon.svg resolve
+# without nginx. `config.views.spa` then answers every non-API path with
+# index.html. When the directory is absent — local Compose, where the Vite dev
+# server owns the frontend — none of this engages.
+_VITE_ASSET = re.compile(r'^/assets/.+-[A-Za-z0-9_-]{8,}\.[a-z0-9]+$')
+
+
+def _is_hashed_asset(path, url):
+    """True for Vite's content-hashed output, which is safe to cache forever."""
+    return _VITE_ASSET.match(url) is not None
+
+
+FRONTEND_DIST = BASE_DIR / 'frontend_dist'
+SERVE_SPA = FRONTEND_DIST.is_dir()
+
+if SERVE_SPA:
+    WHITENOISE_ROOT = FRONTEND_DIST
+    # index.html must never be cached, or a deploy leaves browsers loading
+    # asset filenames that no longer exist.
+    WHITENOISE_INDEX_FILE = False
+
+    # WhiteNoise only caches aggressively for files it *knows* are
+    # content-hashed, which it learns from Django's staticfiles manifest —
+    # and Vite's output is not in that manifest. Without this it falls back to
+    # 60 seconds, so a returning visitor re-downloads the whole bundle roughly
+    # every minute. Vite emits assets/<name>-<hash>.<ext>, which is safe to
+    # pin for a year: a new build is a new filename.
+    WHITENOISE_IMMUTABLE_FILE_TEST = _is_hashed_asset
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -231,6 +280,20 @@ CORS_ALLOW_CREDENTIALS = True
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Django 5 rejects an admin POST whose Origin is not listed here, so without
+# this the admin login form fails on any HTTPS deploy — with a CSRF error that
+# does not mention the setting.
+CSRF_TRUSTED_ORIGINS = [
+    origin for origin in config('CSRF_TRUSTED_ORIGINS', default='').split(',') if origin
+]
+
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000, cast=int)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
 
 EMAIL_BACKEND = config(
@@ -247,16 +310,43 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@hireflow.com'
 # Without this, django.core.cache falls back to per-process LocMemCache, so the
 # rendered-PDF cache would miss on every other gunicorn worker (and the
 # canonical-skill cache would never invalidate).
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        # Deliberately db 2 — db 0 is the Celery broker, db 1 the result backend.
-        'LOCATION': config('CACHE_URL', default='redis://redis:6379/2'),
+# Compose keeps its Redis by default. A single-service deploy with no Redis
+# sets CACHE_URL=database to opt out explicitly — rather than the absence of a
+# variable quietly changing which backend the app uses.
+_CACHE_URL = config('CACHE_URL', default='redis://redis:6379/2')
+
+if _CACHE_URL and _CACHE_URL != 'database':
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            # Deliberately db 2 — db 0 is the Celery broker, db 1 the result backend.
+            'LOCATION': _CACHE_URL,
+        }
     }
-}
+else:
+    # No Redis on the plan. A database table is slower than Redis but it is
+    # *shared*, which is the property that matters: the default LocMemCache is
+    # per-process, so with more than one gunicorn worker the rendered-PDF cache
+    # would miss on every other request and the single-flight lock that stops
+    # duplicate renders would not work at all.
+    # Requires: manage.py createcachetable (the entrypoint runs it).
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'django_cache',
+        }
+    }
 
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://redis:6379/0')
 CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://redis:6379/1')
+
+# On a plan with no worker process a queued task would never run, and the first
+# thing that breaks is the verification email — which means nobody can finish
+# registering. Eager mode runs tasks inline instead: correct, but the register
+# and CV-upload requests then do that work themselves and take longer.
+# Opt in deliberately; the default keeps the real queue.
+CELERY_TASK_ALWAYS_EAGER = config('CELERY_TASK_ALWAYS_EAGER', default=False, cast=bool)
+CELERY_TASK_EAGER_PROPAGATES = False
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
