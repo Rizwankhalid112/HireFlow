@@ -56,4 +56,28 @@ if [ "${RUN_SEEDS:-true}" = "true" ]; then
   fi
 fi
 
+# Create the admin account when one is asked for and does not exist yet.
+#
+# Managed platforms often give no shell, so `createsuperuser` cannot be run
+# after a deploy and there is no way into the admin at all. Both variables must
+# be set; nothing is created otherwise, and an existing account is never
+# touched — so this cannot silently reset a password.
+if [ -n "${DJANGO_SUPERUSER_EMAIL}" ] && [ -n "${DJANGO_SUPERUSER_PASSWORD}" ]; then
+  python manage.py shell -c "
+from django.contrib.auth import get_user_model
+import os
+User = get_user_model()
+email = os.environ['DJANGO_SUPERUSER_EMAIL']
+if User.objects.filter(email=email).exists():
+    print(f'Admin {email} already exists — leaving it alone.')
+else:
+    User.objects.create_superuser(
+        email=email,
+        password=os.environ['DJANGO_SUPERUSER_PASSWORD'],
+        full_name=os.environ.get('DJANGO_SUPERUSER_NAME', 'Admin'),
+    )
+    print(f'Created admin {email}.')
+"
+fi
+
 exec "$@"

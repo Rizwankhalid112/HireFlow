@@ -296,6 +296,15 @@ if not DEBUG:
 
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
 
+# The console backend prints mail to stdout instead of sending it. That is
+# right for local work and actively harmful in a deployment: no user can ever
+# complete registration, and every verification link — each one a working
+# account-takeover token — is written in clear text to the platform's logs,
+# readable by anyone who can open the dashboard.
+#
+# Set EMAIL_BACKEND to the SMTP backend and the four EMAIL_HOST_* values to fix
+# it; see .env.example. The warning below exists because this failure is
+# completely silent: registration returns 201 either way.
 EMAIL_BACKEND = config(
     'EMAIL_BACKEND',
     default='django.core.mail.backends.console.EmailBackend',
@@ -305,7 +314,87 @@ EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+
+# Django defaults this to None, which means an unreachable mail server is
+# waited on forever. Because there is no worker, the send happens inside the
+# request — so "forever" becomes gunicorn's worker timeout, and registration
+# returns 500 instead of 201. A host that silently drops outbound SMTP (common
+# on free plans) hits exactly that path.
+#
+# Ten seconds is longer than any healthy SMTP handshake and short enough that
+# the user gets their account either way.
+EMAIL_TIMEOUT = config('EMAIL_TIMEOUT', default=10, cast=int)
+
+# Whether login requires a verified address.
+#
+# Turn this off only where mail genuinely cannot be delivered — a host that
+# blocks outbound SMTP, for instance. It is a real reduction in security:
+# anyone can register with an address they do not own, so do not leave it off
+# once mail works.
+#
+# Registration still sends the mail and the verification link still works;
+# this only stops an unverified account being refused at the door.
+REQUIRE_EMAIL_VERIFICATION = config('REQUIRE_EMAIL_VERIFICATION', default=True, cast=bool)
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@hireflow.com')
+
+
+# Logging. There was none, which on a hosted deploy means the only evidence of
+# anything going wrong is whatever happens to reach stderr by accident — and an
+# email that failed to send reached nothing at all.
+#
+# Deliberately plain: one console handler, because every platform worth using
+# collects stdout. No files, no rotation, nothing to configure per host.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '[{levelname}] {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        # Our own code at INFO: these are the lines that say a gather ran or an
+        # email went out, and they are worth having in a deploy log.
+        'apps': {
+            'handlers': ['console'],
+            'level': config('LOG_LEVEL', default='INFO'),
+            'propagate': False,
+        },
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        # Every 404 for a missing favicon is not worth a log line.
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    },
+}
+
+if not DEBUG and 'console' in EMAIL_BACKEND:
+    import warnings
+
+    warnings.warn(
+        'EMAIL_BACKEND is the console backend while DEBUG is off. No mail will '
+        'be sent: verification and password-reset links will only appear in the '
+        'server log, so nobody can finish registering and those links are '
+        'exposed to anyone who can read it. Configure SMTP — see .env.example.',
+        RuntimeWarning,
+    )
 
 # Without this, django.core.cache falls back to per-process LocMemCache, so the
 # rendered-PDF cache would miss on every other gunicorn worker (and the
