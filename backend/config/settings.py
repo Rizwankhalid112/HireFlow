@@ -296,6 +296,15 @@ if not DEBUG:
 
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:5173')
 
+# The console backend prints mail to stdout instead of sending it. That is
+# right for local work and actively harmful in a deployment: no user can ever
+# complete registration, and every verification link — each one a working
+# account-takeover token — is written in clear text to the platform's logs,
+# readable by anyone who can open the dashboard.
+#
+# Set EMAIL_BACKEND to the SMTP backend and the four EMAIL_HOST_* values to fix
+# it; see .env.example. The warning below exists because this failure is
+# completely silent: registration returns 201 either way.
 EMAIL_BACKEND = config(
     'EMAIL_BACKEND',
     default='django.core.mail.backends.console.EmailBackend',
@@ -306,6 +315,17 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@hireflow.com')
+
+if not DEBUG and 'console' in EMAIL_BACKEND:
+    import warnings
+
+    warnings.warn(
+        'EMAIL_BACKEND is the console backend while DEBUG is off. No mail will '
+        'be sent: verification and password-reset links will only appear in the '
+        'server log, so nobody can finish registering and those links are '
+        'exposed to anyone who can read it. Configure SMTP — see .env.example.',
+        RuntimeWarning,
+    )
 
 # Without this, django.core.cache falls back to per-process LocMemCache, so the
 # rendered-PDF cache would miss on every other gunicorn worker (and the
