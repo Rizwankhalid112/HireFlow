@@ -161,7 +161,11 @@ export const acceptSuggestion = (logId, index) =>
    with no auth, so it can be used directly as an <img src> — a Bearer token
    cannot be attached to an image request. */
 export const templateSampleUrl = (templateId) => {
-  const base = import.meta.env.VITE_API_URL || 'http://localhost/api';
+  /* Relative, for the same reason as the axios base: this string is inlined at
+     build time, so an absolute default shipped a bundle asking every deployment
+     for its thumbnails from localhost. It is the one API URL built by hand
+     rather than going through the axios instance, which is how it was missed. */
+  const base = import.meta.env.VITE_API_URL || '/api';
   return `${base.replace(/\/$/, '')}/cv/templates/${templateId}/sample/`;
 };
 
