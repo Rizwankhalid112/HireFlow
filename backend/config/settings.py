@@ -316,6 +316,54 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@hireflow.com')
 
+
+# Logging. There was none, which on a hosted deploy means the only evidence of
+# anything going wrong is whatever happens to reach stderr by accident — and an
+# email that failed to send reached nothing at all.
+#
+# Deliberately plain: one console handler, because every platform worth using
+# collects stdout. No files, no rotation, nothing to configure per host.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '[{levelname}] {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        # Our own code at INFO: these are the lines that say a gather ran or an
+        # email went out, and they are worth having in a deploy log.
+        'apps': {
+            'handlers': ['console'],
+            'level': config('LOG_LEVEL', default='INFO'),
+            'propagate': False,
+        },
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        # Every 404 for a missing favicon is not worth a log line.
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    },
+}
+
 if not DEBUG and 'console' in EMAIL_BACKEND:
     import warnings
 
