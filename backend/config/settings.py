@@ -193,15 +193,58 @@ REST_FRAMEWORK = {
 }
 
 # --- AI writing suggestions -------------------------------------------------
-# The key is read from the environment and never checked in. If it is absent the
-# suggestion endpoints return 503 with a clear message; nothing else degrades.
+# Keys are read from the environment and never checked in. If none is present
+# the AI endpoints return 503 with a clear message and the navigation stops
+# offering the features; nothing else degrades.
 ANTHROPIC_API_KEY = config('ANTHROPIC_API_KEY', default='')
+GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
+
+# Left blank, the provider is inferred from whichever key is set, so turning AI
+# on is a matter of supplying one key. Name it ('anthropic' or 'gemini') only
+# when both are present and the choice is deliberate.
+AI_PROVIDER = config('AI_PROVIDER', default='')
 
 # Opus 5. Suggestions are short-form generation, so effort stays low — the
 # quality ceiling here is set by the guardrails, not by thinking depth.
 AI_MODEL = config('AI_MODEL', default='claude-opus-5')
 AI_EFFORT = config('AI_EFFORT', default='low')
+
+# A comma-separated preference order, not one name. Google's free tier meters
+# per model per day — gemini-3.6-flash allows 20 requests, which one afternoon
+# of testing exhausts — so a single name means the feature dies mid-demo with no
+# way back. Each entry carries its own quota, and the client falls through on a
+# 429 or a 503.
+#
+# Ordered by output quality, not by allowance, because the fall-through already
+# handles the allowance. Measured on the bullet writer, which is the strictest
+# caller: flash-lite declines to write and returns a gap question where flash
+# produces three usable variants — defensible behaviour, but an empty panel to
+# anyone watching. So flash leads and lite catches the overflow.
+#
+# Versions are pinned rather than `-latest`: a silent model change under a CV
+# feature is a silent change in what it writes about someone's career.
+GEMINI_MODEL = config(
+    'GEMINI_MODEL',
+    default='gemini-3.5-flash,gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-3.6-flash',
+)
+
+# Gemini draws thinking tokens from the same budget as the answer, so a model
+# left to think freely on a long schema can spend the whole allowance before the
+# object is closed and return nothing parseable. Measured, not guessed: left
+# unset, one summary call spent 572 thinking tokens on a 130-token answer.
+# Blank omits the setting and restores that default.
+GEMINI_THINKING_LEVEL = config('GEMINI_THINKING_LEVEL', default='low')
+
 AI_TIMEOUT_SECONDS = config('AI_TIMEOUT_SECONDS', default=30, cast=int)
+
+# Google's free tier returns a transient 503 under load often enough that one
+# attempt is not enough for a demo. The bound matters more than the number:
+# attempts x AI_TIMEOUT_SECONDS plus the backoff must stay under the web
+# server's worker timeout (60s under gunicorn), or the worker is killed mid-call
+# and the user gets a blank 502 instead of our handled 503 -- the same failure
+# that made registration look broken. Set AI_TIMEOUT_SECONDS to 20 where the
+# worker timeout is 60.
+AI_RETRY_ATTEMPTS = config('AI_RETRY_ATTEMPTS', default=2, cast=int)
 
 # Monthly per-user allowance. ~1 cent per suggestion, so 60 lands near the
 # market's free tier (Teal ships 10 bullet + 2 summary credits).
@@ -263,6 +306,13 @@ AI_JOB_MATCH_MONTHLY_LIMIT = config('AI_JOB_MATCH_MONTHLY_LIMIT', default=20, ca
 # Keyword lists plus a full cover letter. Past this the structured output is cut
 # off mid-object and arrives as nothing at all.
 AI_JOB_MATCH_MAX_TOKENS = config('AI_JOB_MATCH_MAX_TOKENS', default=6000, cast=int)
+
+# --- CV tailoring (storage room) --------------------------------------------
+# How long a tailored CV is kept. Matches JOBS_RETENTION_DAYS deliberately: a
+# tailored CV is only useful while the posting it was written for is live, and
+# the documents are stored in the database, so unbounded retention is unbounded
+# database growth.
+TAILORED_CV_RETENTION_DAYS = config('TAILORED_CV_RETENTION_DAYS', default=45, cast=int)
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),

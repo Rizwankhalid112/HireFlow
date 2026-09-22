@@ -28,6 +28,7 @@ from apps.cv_builder.models import (
 )
 from apps.cv_builder.services.ai import (
     SuggestionUnavailable,
+    is_configured,
     suggest_bullets,
     suggest_project_points,
     suggest_skills,
@@ -180,5 +181,7 @@ class SuggestionCreditsView(APIView):
             'used': used,
             'limit': settings.AI_MONTHLY_CREDITS,
             'remaining': max(settings.AI_MONTHLY_CREDITS - used, 0),
-            'enabled': bool(settings.ANTHROPIC_API_KEY),
+            # Asked of the client rather than of a specific key, so that adding
+            # a provider does not mean remembering to widen a boolean here.
+            'enabled': is_configured(),
         })

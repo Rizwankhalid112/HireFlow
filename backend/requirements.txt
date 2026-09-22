@@ -14,8 +14,12 @@ Pillow==11.1.0
 requests==2.32.3
 cryptography
 
-# AI writing suggestions (Module 8 / cv_builder)
+# AI writing suggestions (Module 8 / cv_builder). Either key turns the features
+# on -- see AI_PROVIDER in config/settings.py. Both SDKs ship because which one
+# a deployment uses is an environment decision, not a build-time one, and the
+# unused one costs an import that never happens.
 anthropic==1.3.0
+google-genai==2.24.0
 
 # CV upload text extraction (spec Steps 7-8). Both are pure Python -- pdfplumber
 # pulls pdfminer.six, python-docx pulls lxml -- so unlike WeasyPrint neither

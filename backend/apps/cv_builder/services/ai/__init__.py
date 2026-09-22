@@ -1,4 +1,4 @@
-from apps.cv_builder.services.ai.client import SuggestionUnavailable
+from apps.cv_builder.services.ai.client import SuggestionUnavailable, is_configured, provider
 from apps.cv_builder.services.ai.job_match import JobDescriptionTooShort, match_job
 from apps.cv_builder.services.ai.parse import parse_cv_text
 from apps.cv_builder.services.ai.suggest import (
@@ -11,6 +11,8 @@ from apps.cv_builder.services.ai.suggest import (
 
 __all__ = [
     'SuggestionUnavailable',
+    'is_configured',
+    'provider',
     'parse_cv_text',
     'match_job',
     'JobDescriptionTooShort',

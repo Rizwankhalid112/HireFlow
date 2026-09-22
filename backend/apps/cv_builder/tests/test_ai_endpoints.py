@@ -33,8 +33,14 @@ def experience(sample_cv):
 class TestAvailability:
     def test_without_a_key_the_endpoint_degrades_to_503(self, api, sample_cv, settings):
         """No key configured is a server state, not a user error — so 503 and a
-        message that tells them their text is safe."""
+        message that tells them their text is safe.
+
+        Both keys, because either one turns the feature on: clearing only the
+        one this test was written against passed while the feature was still
+        live on the other provider.
+        """
         settings.ANTHROPIC_API_KEY = ''
+        settings.GEMINI_API_KEY = ''
 
         response = api.post('/api/cv/suggest/summary/', {}, format='json')
 
@@ -52,9 +58,15 @@ class TestAvailability:
         self, api, sample_cv, settings,
     ):
         settings.ANTHROPIC_API_KEY = ''
+        settings.GEMINI_API_KEY = ''
         assert api.get('/api/cv/suggest/credits/').json()['enabled'] is False
 
+        # Each provider on its own is enough to turn the feature on.
         settings.ANTHROPIC_API_KEY = 'test-key-not-a-real-credential'
+        assert api.get('/api/cv/suggest/credits/').json()['enabled'] is True
+
+        settings.ANTHROPIC_API_KEY = ''
+        settings.GEMINI_API_KEY = 'test-key-not-a-real-credential'
         assert api.get('/api/cv/suggest/credits/').json()['enabled'] is True
 
 
