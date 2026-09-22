@@ -91,10 +91,22 @@ def build_render_plan(cv, template_id=None):
     )
 
 
-def _render(plan, cv):
-    """WeasyPrint. The expensive part — everything else exists to avoid it."""
-    html_string = render_to_string(plan.template['file'], plan.context)
+def render_context_pdf(context, template):
+    """Render an arbitrary context through a template.
 
+    For tailoring, which renders content that deliberately does not match
+    anything in the database — the master CV is never edited, so the tailored
+    content exists only in memory and as a frozen snapshot.
+
+    Uncached on purpose: this is produced once, when the user accepts, and
+    caching a one-off render would only evict previews that are asked for
+    repeatedly.
+    """
+    return _html_to_pdf(render_to_string(template['file'], context))['pdf']
+
+
+def _html_to_pdf(html_string, cv=None):
+    """WeasyPrint. The expensive part — everything else exists to avoid it."""
     # Imported lazily: WeasyPrint pulls in Pango at import time, and keeping it
     # out of module scope means the rest of the app still boots if the system
     # libraries are missing.
@@ -111,10 +123,14 @@ def _render(plan, cv):
         document = HTML(string=html_string, base_url=str(settings.MEDIA_ROOT)).render()
         pdf_bytes = document.write_pdf()
     except Exception as exc:
-        logger.exception('WeasyPrint failed for CV %s: %s', cv.id, exc)
+        logger.exception('WeasyPrint failed for CV %s: %s', getattr(cv, 'id', '-'), exc)
         raise RenderError('Could not generate your CV PDF.') from exc
 
     return {'pdf': pdf_bytes, 'page_count': len(document.pages)}
+
+
+def _render(plan, cv):
+    return _html_to_pdf(render_to_string(plan.template['file'], plan.context), cv)
 
 
 def _render_single_flight(plan, cv):

@@ -18,6 +18,9 @@ export const cvKeys = {
   projects: ['cv', 'projects'],
   certifications: ['cv', 'certifications'],
   languages: ['cv', 'languages'],
+  versions: ['cv', 'versions'],
+  version: (id) => ['cv', 'versions', id],
+  tailorPreview: (matchId) => ['cv', 'tailor-preview', matchId],
 };
 
 /* Any section write changes completion_score, so the profile and completion
@@ -753,5 +756,65 @@ export function useDeleteJobMatch() {
       toast.success('Removed.');
     },
     onError: onMutationError,
+  });
+}
+
+
+// --- Tailoring and the storage room ------------------------------------------
+
+export function useTailorPreview(matchId) {
+  return useQuery({
+    queryKey: cvKeys.tailorPreview(matchId),
+    queryFn: () => cvApi.previewTailor(matchId).then((r) => r.data),
+    enabled: Boolean(matchId),
+    /* The answer is derived from a stored analysis and a stored document, so it
+       cannot change until one of them does. */
+    staleTime: Infinity,
+  });
+}
+
+export function useTailorCv(matchId) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (accept) => cvApi.tailorCv(matchId, accept).then((r) => r.data),
+    onSuccess: (version) => {
+      queryClient.invalidateQueries({ queryKey: cvKeys.versions });
+      const changes = version.change_count;
+      toast.success(
+        changes
+          ? `Tailored for ${version.company || 'this role'} — ${changes} ${changes === 1 ? 'change' : 'changes'} applied.`
+          : 'Saved. See the change list for what to update by hand.',
+      );
+    },
+    onError: (error) => toast.error(extractApiError(error, 'Could not tailor this CV.')),
+  });
+}
+
+export function useCvVersions() {
+  return useQuery({
+    queryKey: cvKeys.versions,
+    queryFn: () => cvApi.listCvVersions().then((r) => r.data.versions),
+  });
+}
+
+export function useCvVersion(id) {
+  return useQuery({
+    queryKey: cvKeys.version(id),
+    queryFn: () => cvApi.getCvVersion(id).then((r) => r.data),
+    enabled: Boolean(id),
+  });
+}
+
+export function useDeleteCvVersion() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) => cvApi.deleteCvVersion(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cvKeys.versions });
+      toast.success('Removed.');
+    },
+    onError: (error) => toast.error(extractApiError(error, 'Could not remove that.')),
   });
 }

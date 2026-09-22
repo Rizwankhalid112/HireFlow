@@ -16,6 +16,10 @@ const navItems = [
   { label: 'CV Builder', short: 'CV', to: '/cv-builder', icon: 'cv' },
   { label: 'Job Match', short: 'Match', to: '/job-match', icon: 'match', ai: true },
   { label: 'Jobs', short: 'Jobs', to: '/jobs', icon: 'jobs' },
+  /* Not marked `ai`, unlike Job Match: nothing here calls a model, and these are
+     the user's own saved documents. Hiding the page that holds their data
+     because a key is missing would be worse than showing an empty state. */
+  { label: 'My CVs', short: 'Saved', to: '/my-cvs', icon: 'cv' },
 ];
 
 const initials = (name) =>

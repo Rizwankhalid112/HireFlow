@@ -31,6 +31,16 @@ class CVUploadLog(models.Model):
     file_type = models.CharField(max_length=10, choices=FileType.choices)
     file_path = models.CharField(max_length=500)
     raw_extracted_text = models.TextField(blank=True, default='')
+    # The original bytes, kept only for file types we can tailor in place.
+    #
+    # `file_path` alone is not enough: the host's filesystem is wiped on every
+    # deploy, so the file behind that path is gone within days while the row
+    # survives. Tailoring has to re-open the original, months later.
+    #
+    # PDFs are deliberately not kept — they cannot be edited in place at all
+    # (docs/cv_tailoring_rnd.md §4.3), so their bytes would be stored for
+    # nothing, and these rows live in the database.
+    file_blob = models.BinaryField(null=True, blank=True, editable=False)
     ai_parsed_json = models.JSONField(null=True, blank=True)
     parse_status = models.CharField(
         max_length=20,

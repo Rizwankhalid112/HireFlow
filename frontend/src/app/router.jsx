@@ -23,6 +23,7 @@ const VerifyEmailPage = lazy(routeLoaders['/verify-email']);
 const CVBuilderPage = lazy(routeLoaders['/cv-builder']);
 const JobMatchPage = lazy(routeLoaders['/job-match']);
 const JobsPage = lazy(routeLoaders['/jobs']);
+const MyCVsPage = lazy(routeLoaders['/my-cvs']);
 
 function PageLoader() {
   return (
@@ -56,6 +57,7 @@ export function AppRouter() {
             <Route path="cv-builder" element={<CVBuilderPage />} />
             <Route path="job-match" element={<JobMatchPage />} />
             <Route path="jobs" element={<JobsPage />} />
+            <Route path="my-cvs" element={<MyCVsPage />} />
           </Route>
         </Route>
 
