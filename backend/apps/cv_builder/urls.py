@@ -39,6 +39,13 @@ from apps.cv_builder.views.template import (
     TemplateListView,
     TemplateSampleView,
 )
+from apps.cv_builder.views.tailor import (
+    CVVersionDetailView,
+    CVVersionDownloadView,
+    CVVersionListView,
+    TailorPreviewView,
+    TailorView,
+)
 from apps.cv_builder.views.suggestion import (
     SuggestBulletsView,
     SuggestionAcceptView,
@@ -86,6 +93,16 @@ urlpatterns = [
     path('job-match/', JobMatchView.as_view(), name='cv-job-match'),
     path('job-match/sources/', CVSourceListView.as_view(), name='cv-job-match-sources'),
     path('job-match/<uuid:pk>/', JobMatchDetailView.as_view(), name='cv-job-match-detail'),
+    # Tailoring. No AI call and no meter — the analysis was already paid for
+    # when the match ran, so producing and re-downloading the CV is free.
+    path('job-match/<uuid:pk>/tailor/preview/', TailorPreviewView.as_view(),
+         name='cv-tailor-preview'),
+    path('job-match/<uuid:pk>/tailor/', TailorView.as_view(), name='cv-tailor'),
+    # The storage room.
+    path('versions/', CVVersionListView.as_view(), name='cv-versions'),
+    path('versions/<uuid:pk>/', CVVersionDetailView.as_view(), name='cv-version-detail'),
+    path('versions/<uuid:pk>/download/', CVVersionDownloadView.as_view(),
+         name='cv-version-download'),
     # AI writing suggestions — the only metered endpoints in the project.
     path('suggest/credits/', SuggestionCreditsView.as_view(), name='cv-suggest-credits'),
     path('suggest/bullets/', SuggestBulletsView.as_view(), name='cv-suggest-bullets'),

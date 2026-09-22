@@ -125,15 +125,13 @@ export const JobCard = memo(function JobCard({ job, onOpen, onDelete, onTailor, 
             View
           </Button>
           {/* The join between the two modules: hands this description straight
-              to the match page instead of making the user copy and paste it. */}
-          <Button
-            variant="secondary"
-            size="sm"
-            loading={tailoring}
-            onClick={() => onTailor(job)}
-          >
-            Tailor CV
-          </Button>
+              to the match page instead of making the user copy and paste it.
+              Absent when the deployment has no model key — see JobsPage. */}
+          {onTailor ? (
+            <Button variant="secondary" size="sm" loading={tailoring} onClick={() => onTailor(job)}>
+              Tailor CV
+            </Button>
+          ) : null}
           <a href={job.apply_url} target="_blank" rel="noopener noreferrer">
             <Button size="sm" iconAfter="external">
               Apply

@@ -1,5 +1,6 @@
 from .certification import CVCertification
 from .cv_profile import CVProfile
+from .cv_version import CVVersion
 from .education import Education
 from .job_match import JobMatch, job_matches_used_this_period
 from .language import CVLanguage
@@ -25,6 +26,7 @@ __all__ = [
     'CVLanguage',
     'CVUploadLog',
     'JobMatch',
+    'CVVersion',
     'job_matches_used_this_period',
     'parses_used_this_period',
     'AISuggestionLog',

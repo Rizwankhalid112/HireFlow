@@ -182,3 +182,22 @@ export const listJobMatches = () => api.get('/cv/job-match/');
 export const getJobMatch = (id) => api.get(`/cv/job-match/${id}/`);
 
 export const deleteJobMatch = (id) => api.delete(`/cv/job-match/${id}/`);
+
+// --- Tailoring and the storage room ------------------------------------------
+/* No AI call and no meter: the analysis was paid for when the match ran, so
+   producing and re-downloading a tailored CV is free. */
+export const previewTailor = (matchId) => api.get(`/cv/job-match/${matchId}/tailor/preview/`);
+
+/* `accept` is the subset the user ticked. Omitted entirely means "all of them",
+   which is the default state of the checklist. */
+export const tailorCv = (matchId, accept) =>
+  api.post(`/cv/job-match/${matchId}/tailor/`, accept ? { accept } : {});
+
+export const listCvVersions = () => api.get('/cv/versions/');
+export const getCvVersion = (id) => api.get(`/cv/versions/${id}/`);
+export const deleteCvVersion = (id) => api.delete(`/cv/versions/${id}/`);
+
+/* Fetched rather than linked: the endpoint needs the Bearer token, which an
+   anchor cannot carry. The blob is handed to a temporary link instead. */
+export const downloadCvVersion = (id) =>
+  api.get(`/cv/versions/${id}/download/`, { responseType: 'blob' });

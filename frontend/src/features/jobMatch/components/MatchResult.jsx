@@ -3,6 +3,8 @@ import { toast } from 'sonner';
 
 import { Alert, Badge, Button, Card, Icon, Panel } from '@/components/ui';
 
+import { TailorPanel } from './TailorPanel';
+
 /*
  * What came back from a match.
  *
@@ -172,6 +174,10 @@ export function MatchResult({ match }) {
           </div>
         ) : null}
       </div>
+
+      {/* The buckets above are for reading; this is where the user acts. Only
+          `reworded` is offered — see TailorPanel. */}
+      {match.id ? <TailorPanel matchId={match.id} company={match.company} /> : null}
 
       {match.cover_letter ? (
         <Panel

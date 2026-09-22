@@ -23,6 +23,7 @@ export const routeLoaders = {
   '/cv-builder': () => import('@/features/cvBuilder/pages/CVBuilderPage'),
   '/job-match': () => import('@/features/jobMatch/pages/JobMatchPage'),
   '/jobs': () => import('@/features/jobs/pages/JobsPage'),
+  '/my-cvs': () => import('@/features/jobMatch/pages/MyCVsPage'),
 };
 
 const warmed = new Set();

@@ -95,11 +95,22 @@ class CVUploadView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        # Keep the bytes for file types tailoring can edit in place. The path
+        # above is not enough on its own: the host's filesystem is wiped on
+        # every deploy, and a tailored CV may be asked for months later. PDFs
+        # are not kept — they cannot be edited in place at all, so storing them
+        # would cost database space for nothing.
+        blob = None
+        if serializer.detected_type == CVUploadLog.FileType.DOCX:
+            with default_storage.open(stored_path, 'rb') as handle:
+                blob = handle.read()
+
         log = CVUploadLog.objects.create(
             cv=profile,
             original_filename=(uploaded.name or safe_name)[:300],
             file_type=serializer.detected_type,
             file_path=stored_path,
+            file_blob=blob,
         )
 
         # Imported here rather than at module load: tasks.py imports models, and

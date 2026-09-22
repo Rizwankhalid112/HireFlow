@@ -5,13 +5,21 @@ import { prefetchPrimaryRoutes, prefetchRoute } from '@/app/routes';
 import { Icon, IconButton, Logo } from '@/components/ui';
 import { useTheme } from '@/context/ThemeContext';
 import { useLogout, useProfile } from '@/features/auth/api/authQueries';
-import { useCompletion } from '@/features/cvBuilder/api/cvQueries';
+import { useCompletion, useSuggestionCredits } from '@/features/cvBuilder/api/cvQueries';
 
+/* `ai: true` marks a destination that cannot work without a configured model
+   key. The server reports that per deployment, so rather than showing a nav
+   item that leads to a 503 the entry is simply absent — the same way the CV
+   Builder's suggestion panel already removes itself. */
 const navItems = [
   { label: 'Dashboard', short: 'Home', to: '/home', icon: 'dashboard' },
   { label: 'CV Builder', short: 'CV', to: '/cv-builder', icon: 'cv' },
-  { label: 'Job Match', short: 'Match', to: '/job-match', icon: 'match' },
+  { label: 'Job Match', short: 'Match', to: '/job-match', icon: 'match', ai: true },
   { label: 'Jobs', short: 'Jobs', to: '/jobs', icon: 'jobs' },
+  /* Not marked `ai`, unlike Job Match: nothing here calls a model, and these are
+     the user's own saved documents. Hiding the page that holds their data
+     because a key is missing would be worse than showing an empty state. */
+  { label: 'My CVs', short: 'Saved', to: '/my-cvs', icon: 'cv' },
 ];
 
 const initials = (name) =>
@@ -33,10 +41,16 @@ export function AppLayout() {
      the badge simply does not render until there is a score to show. */
   const { data: completion } = useCompletion();
 
+  /* Undefined while loading, so the item is kept until the server actually
+     says the feature is off — a flash of disappearing navigation is worse
+     than a moment of showing it. */
+  const { data: aiCredits } = useSuggestionCredits();
+  const items = navItems.filter((item) => !item.ai || aiCredits?.enabled !== false);
+
   /* Warm the other authenticated routes once the browser is idle, so the first
      click into any of them is instant rather than a cold chunk fetch. */
   useEffect(() => {
-    prefetchPrimaryRoutes(navItems.map((item) => item.to));
+    prefetchPrimaryRoutes(navItems.filter((i) => !i.ai).map((item) => item.to));
   }, []);
 
   const fullName = profile?.user?.full_name || 'there';
@@ -62,7 +76,7 @@ export function AppLayout() {
           <p className="px-2 pb-1.5 text-[11px] font-semibold tracking-wider text-subtle uppercase">
             Workspace
           </p>
-          {navItems.map((item) => (
+          {items.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -149,9 +163,10 @@ export function AppLayout() {
           page on a phone at all. 44px targets. */}
       <nav
         aria-label="Primary"
-        className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 gap-1 border-t border-line bg-surface px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden"
+        style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
+        className="fixed inset-x-0 bottom-0 z-40 grid gap-1 border-t border-line bg-surface px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden"
       >
-        {navItems.map((item) => (
+        {items.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
