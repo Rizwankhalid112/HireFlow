@@ -11,6 +11,7 @@ import {
   Select,
   SkeletonRows,
 } from '@/components/ui';
+import { useSuggestionCredits } from '@/features/cvBuilder/api/cvQueries';
 import { useDebouncedValue } from '@/features/cvBuilder/hooks/useDebouncedValue';
 
 import * as jobsApi from '../api/jobsApi';
@@ -68,6 +69,10 @@ export default function JobsPage() {
 
   const { data, error, isLoading, isFetching, isError } = useJobs(params);
   const { data: stats } = useJobStats();
+  /* "Tailor CV" hands the posting to Job Match, which needs a model key. With
+     none configured that button leads to a 503, so it is not offered. */
+  const { data: aiCredits } = useSuggestionCredits();
+  const canTailor = aiCredits?.enabled !== false;
   const remove = useDeleteJob();
 
   /* A filter change invalidates the current page number. */
@@ -234,7 +239,7 @@ export default function JobsPage() {
                 job={job}
                 onOpen={onOpen}
                 onDelete={onDelete}
-                onTailor={onTailor}
+                onTailor={canTailor ? onTailor : undefined}
                 tailoring={tailoringId === job.id}
               />
             ))}

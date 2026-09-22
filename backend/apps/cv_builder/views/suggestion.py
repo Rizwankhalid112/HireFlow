@@ -21,6 +21,7 @@ from rest_framework.views import APIView
 
 from apps.cv_builder.models import (
     AISuggestionLog,
+    CVProfile,
     CVProject,
     WorkExperience,
     credits_used_this_period,
@@ -165,8 +166,15 @@ class SuggestionCreditsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        profile = get_user_cv_profile(request.user)
-        used = credits_used_this_period(profile)
+        """`enabled` answers a question about the deployment, not the user.
+
+        This used to 404 for anyone without a CV yet — but the navigation reads
+        `enabled` to decide whether to offer AI features at all, and a brand new
+        account is exactly who is looking at that navigation. So the profile is
+        optional: no CV simply means nothing has been spent.
+        """
+        profile = CVProfile.objects.filter(user=request.user).first()
+        used = credits_used_this_period(profile) if profile else 0
 
         return Response({
             'used': used,
